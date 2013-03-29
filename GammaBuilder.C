@@ -45,7 +45,7 @@ int main(int argc, char **argv){
     inputs.push_back(string(argv[i]));
   }
   if (inputs.size() == 0 ){ // no argumnets display helpful message
-    cout<<"Usage: ./NeutronBuilder runNumber [options:value]"<<endl;
+    cout<<"Usage: ./GammaBuilder runNumber [options:value]"<<endl;
     return 0;
   }  
   
@@ -166,6 +166,14 @@ int main(int argc, char **argv){
     maxentry=nentry;
   
 
+  inT->GetEntry(0); // Look at first Entry to see what is there 
+  if (trace.size()==0){
+    cout<<"Trace not recorded.  Using internal CFD"<<endl;
+    
+
+  }
+  
+  
 
 
   //non branch timing variables 
