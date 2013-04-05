@@ -1,6 +1,9 @@
 #include <vector>
 #include "TFile.h"
+/*
+random functions for the builder
 
+ */
 
 
 struct Sl_Event {
@@ -8,6 +11,7 @@ struct Sl_Event {
   vector <UShort_t> trace;
   Long64_t jentry;
   Double_t time;
+  Double_t energy;
 };
 
 
@@ -47,7 +51,8 @@ Bool_t checkChannels(vector <Sl_Event> &in){
 }
 
 void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRollingWindow,
-		       Double_t &time,Int_t &chanid,vector <UShort_t>& trace,Long64_t &jentry){
+		       Double_t &time,Int_t &chanid,vector <UShort_t>& trace,Long64_t &jentry,
+		       Double_t energy){
 
     //Keep the previous event info for correlating      
     if (previousEvents.size() < sizeOfRollingWindow  ) 
@@ -57,6 +62,7 @@ void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRolling
 	e.trace=trace;
 	e.jentry=jentry;
 	e.time =time;
+	e.energy=energy;
 	previousEvents.push_back(e);
       }
     else if (previousEvents.size() >= sizeOfRollingWindow )
@@ -68,6 +74,7 @@ void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRolling
 	e.trace = trace;
 	e.jentry =jentry;
 	e.time=time;
+	e.energy=energy;
 	previousEvents.push_back(e);	  
       }
 
