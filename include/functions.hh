@@ -31,19 +31,17 @@ Bool_t checkChannels(vector <Sl_Event> &in){
   //should be there 
 
 
-  int tot =0;
   for (int i=0;i <ch.size();i++){
     if (ch[i]==true){
       count++;
+      
       if (i==8 || i ==9 ){
 	liq_scint_count++;
-      } else {
-	tot=tot +i;
-      }
+      } 
     }
   }
   
-  if (count == 3 && liq_scint_count==1 && (tot==1 || tot==5 ))
+  if (count == 3 && liq_scint_count==1 )
     return true;
   else 
     return false;
@@ -53,6 +51,7 @@ Bool_t checkChannels(vector <Sl_Event> &in){
 void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRollingWindow,
 		       Double_t &time,Int_t &chanid,vector <UShort_t>& trace,Long64_t &jentry,
 		       Double_t energy){
+
 
     //Keep the previous event info for correlating      
     if (previousEvents.size() < sizeOfRollingWindow  ) 

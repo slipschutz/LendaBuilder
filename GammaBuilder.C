@@ -165,7 +165,7 @@ int main(int argc, char **argv){
   if(maxentry == -1)
     maxentry=nentry;
   
-  
+
 
 
   //non branch timing variables 
@@ -201,13 +201,14 @@ int main(int argc, char **argv){
 	    }
 	  }
 
+	  //	  timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
 	  timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
 	  if (TMath::Abs(timeDiff) <100){
 	    ///Good event
 	    //Run filters and such on these events 
 	    vector <Double_t> thisEventsFF;
 	    vector <Double_t> thisEventsCFD;
-	    
+
 	    for (int i=0;i<events.size();++i){
 	      Double_t thisEventsIntegral=0;
 	      Double_t longGate=0;
