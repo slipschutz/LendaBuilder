@@ -23,7 +23,7 @@ public:
   std::stringstream outputFileName;
 
 
-  string timingMode;
+  string fileNotes;
   
 
 };

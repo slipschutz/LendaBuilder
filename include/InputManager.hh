@@ -23,6 +23,7 @@ public:
   Bool_t makeTraces,ext_flag;
   Bool_t correction;
   
+  string fileNotes;
   string timingMode;
   Double_t FL,FG,d,w;
 

@@ -15,7 +15,7 @@ FileManager::FileManager()
   outputFileName.str("Defualt");
   fileName.str("Defualt");
 
-  timingMode="softwareCFD";//Default to softwareCFD
+  fileNotes="";//Default to nothing
 
 }
 
@@ -34,7 +34,7 @@ TString FileManager::loadFile(Int_t runNum,Int_t fileNum) {
   }
 
   
-  outputFileName << fileName.str()<<"-"<<timingMode;
+  outputFileName << fileName.str()<<"-"<<fileNotes;
 
   if (fileNum < 10){
     fileName<<"-0"<<fileNum;

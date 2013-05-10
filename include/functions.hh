@@ -18,17 +18,16 @@ struct Sl_Event {
 
 Bool_t checkChannels(vector <Sl_Event> &in){
 
-  vector <Bool_t> ch(20,false);  //to make this work with different cable arrangements
+  vector <Bool_t> ch(16,false);  //to make this work with different cable arrangements
 
   for (int i=0;i<in.size();i++){
       ch[in[i].channel]=true;
   }
-  // if it was a good event there should be 3 trues
-  //from 3 different channels
+  // if it was a good event there should be 4 trues
+  //from 4 different channels
   int count=0;
-  int liq_scint_count=0; //there should be only one liq scint
-  // at the moment they are pluged into 8 and 9 so only one of those 
-  //should be there 
+  int liq_scint_count=0; //there should be no  liq scint in this setup
+  // at the moment they are pluged into 8 and 9
 
 
   for (int i=0;i <ch.size();i++){
@@ -41,7 +40,7 @@ Bool_t checkChannels(vector <Sl_Event> &in){
     }
   }
   
-  if (count == 3 && liq_scint_count==1 )
+  if (count == 4 && liq_scint_count==0 )
     return true;
   else 
     return false;

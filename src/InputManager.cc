@@ -15,12 +15,12 @@ InputManager::InputManager()
   //set defualts
   runNum=-1;
   numFiles=1;//assume 1 file
-  timingMode="softwareCFD";
+  fileNotes="4Channel-Gamma";
   makeTraces=false;
   correction=false;
 
   specificFileName="";
-
+  timingMode="Not_in_use";
   //defualt Filter settings see pixie manual
   FL=2;
   FG=0;
@@ -35,6 +35,7 @@ InputManager::InputManager()
   validTimingModes.push_back("internalCFD");
   validTimingModes.push_back("softwareCFD");
   validTimingModes.push_back("fitting");
+  validTimingModes.push_back("Not_in_use");
 
 }
 InputManager::~InputManager()
@@ -123,7 +124,9 @@ Bool_t InputManager::loadInputs(vector <string> & inputs){
       w=atof(arguments[i].c_str() );ext_flag=true;
     } else if (flags[i] == "sigma"){
       sigma = atof(arguments[i].c_str());ext_sigma_flag=true;
-    } else {
+    } else if (flags[i]=="notes"){
+      fileNotes=arguments[i];
+    }else {
       cout<<flags[i] <<" :Unkown option"<<endl;
       return false;
     }  
@@ -151,9 +154,13 @@ Bool_t InputManager::checkValues()
   }
   
   if (timingBool == false ){
-    nothingWrong =false;
-    dumpValidModes();
+    //    nothingWrong =false;
+    //    dumpValidModes();
   }
+  if (timingMode != "Not_in_use"){
+    cout<<"***Warning Timing mode specification is Obsolete.  Use notes:***"<<endl;
+  }
+
 
   if (correction==true && specificFileName==""){
     nothingWrong =false;

@@ -85,11 +85,12 @@ int main(int argc, char **argv){
   TFile *outFile=0;
   TTree  *outT;
   FileManager * fileMan = new FileManager();
-  fileMan->timingMode = theInputManager.timingMode;
+  fileMan->fileNotes = theInputManager.fileNotes;
   
+  //The input trees are put into a TChain
   TChain * inT;
   
-  inT= new TChain("dchan");
+  inT= new TChain("dchan");//dchan is name of tree in ddas rootfiles
   if (numFiles == -1 ){
     TString s = fileMan->loadFile(runNum,0);
     inT->Add(s);
@@ -100,14 +101,15 @@ int main(int argc, char **argv){
     }
   }
   
-  inT->SetMakeClass(1);
-  Long64_t nentry=(Long64_t) (inT->GetEntries());
+  inT->SetMakeClass(1);//This does something
   
+  Long64_t nentry=(Long64_t) (inT->GetEntries());
   cout <<"The number of entires is : "<< nentry << endl ;
   
   // Openning output Tree and output file
     
-  if (extFlag == false && ext_sigma_flag==false)
+  //Note FileManager expects fileMan->loadFile before getting outputfile
+  if (extFlag == false && ext_sigma_flag==false) //if there are no flags
     outFile = fileMan->getOutputFile();
   else if (extFlag == true && ext_sigma_flag==false){
     CFD_scale_factor = CFD_scale_factor/10.0; //bash script does things in whole numbers
@@ -158,14 +160,12 @@ int main(int argc, char **argv){
 
   ////////////////////////////////////////////////////////////////////////////////////
   vector <Sl_Event> previousEvents;
-  Double_t sizeOfRollingWindow=3;  //Require that a lenda bar fired in both PMTS and one liquid scint
+  Double_t sizeOfRollingWindow=4;  //Require that a lenda bar fired in both PMTS and one liquid scint
   
   ////////////////////////////////////////////////////////////////////////////////////
   
   if(maxentry == -1)
     maxentry=nentry;
-  
-
 
 
   //non branch timing variables 
@@ -180,7 +180,7 @@ int main(int argc, char **argv){
     
     inT->GetEntry(jentry); // Get the event from the input tree 
     ///////////////////////////////////////////////////////////////////////////////////////////
-    
+
     if ( previousEvents.size() >= sizeOfRollingWindow ) {
       if ( checkChannels(previousEvents) )//prelinary check to see if there are 3 distinict channels in set
 	{ 
@@ -201,56 +201,83 @@ int main(int argc, char **argv){
 	    }
 	  }
 
-	  //	  timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
-	  timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
-	  if (TMath::Abs(timeDiff) <100){
-	    ///Good event
+	  
+	  
+
+
+
+	  /*if (TMath::Abs(timeDiff)<10){
+	    for (int i=0;i<events.size();++i){
+	      cout<<"Event in list "<<i<<endl;
+	      cout<<"Channel is "<<events[i]->channel<<endl;
+	      cout<<"Energy is "<<events[i]->energy<<endl;
+	      cout<<"jentry is "<<events[i]->jentry<<endl;
+	      cout<<"Time is "<<events[i]->time<<endl;
+	      cout<<"\n";
+	    }
+	    
+	    cout<<"TIME DIFF IS "<<timeDiff<<endl;
+	    int t;cin>>t;	  
+	  }*/
+	  
+
+	  
+	  timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
+	  //	  timeDiff = (events[1]->time -events[0]->time);
+	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
+	  if (TMath::Abs(timeDiff) <10){
+	    ///This is now a Good event
 	    //Run filters and such on these events 
 	    vector <Double_t> thisEventsFF;
 	    vector <Double_t> thisEventsCFD;
 
 	    for (int i=0;i<events.size();++i){
-	      Double_t thisEventsIntegral=0;
-	      Double_t longGate=0;
-	      Double_t shortGate=0;
+	      Double_t thisEventsIntegral=0; //intialize
+	      Double_t longGate=0; //intialize
+	      Double_t shortGate=0; //intialize
 	      if ((events[i]->trace).size()!=0){ //if this event has a trace calculate filters and such
-		theFilter.FastFilter(events[i]->trace,thisEventsFF,FL,FG);
-		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor);
-		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD);
-		start = TMath::Floor(softwareCFD) -5;
+		theFilter.FastFilter(events[i]->trace,thisEventsFF,FL,FG); //run FF algorithim
+		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
+		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD); //find zeroCrossig of CFD
+		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
 		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
 		longGate = theFilter.getGate(events[i]->trace,start,25);
 		shortGate = theFilter.getGate(events[i]->trace,start,14);
 		
-		events[i]->energy = thisEventsIntegral;
+		events[i]->energy = thisEventsIntegral; // Over write the energy in this event with the
+		                                        // one calculated from the trace
 	      }
 	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
-
+                                                 //it is 0 if it isn't
+	      //Push other thing into the event
 	      Event->pushLongGate(longGate);
 	      Event->pushShortGate(shortGate);
 	      Event->pushChannel(events[i]->channel);
 	      Event->pushEnergy(events[i]->energy);
 	      Event->pushTime(events[i]->time);
 	    }
-	    Event->Finalize();
-	    outT->Fill();
-	    Event->Clear();
-	  }
-	}
-    }
+	    Event->Finalize(); //Finalize Calculates various parameters and applies corrections
+	    outT->Fill();     //Fill the tree
+	    Event->Clear();  //Always clear events. if you don't you are pushing events on top of other events
+	  }//end timeDiff if
+	}//end checkChannels if
+    } // end rolling window section
     
+    //Push this event (the jentry one in the tree) into the list of 
+    //previous events.
     pushRollingWindow(previousEvents,sizeOfRollingWindow,
 		      time,chanid,trace,jentry,energy);
     
     //Periodic printing
     if (jentry % 10000 == 0 )
-    cout<<"On event "<<jentry<<endl;
+      cout<<"On event "<<jentry<<endl;
   
-}//End for
+}//End main analysis loop
+  
 
-
-
+//Write the tree to file 
 outT->Write();
+//Close the file
 outFile->Close();
 
 cout<<"Number of bad fits "<<theFilter.numOfBadFits<<endl;
