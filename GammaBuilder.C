@@ -160,7 +160,7 @@ int main(int argc, char **argv){
 
   ////////////////////////////////////////////////////////////////////////////////////
   vector <Sl_Event> previousEvents;
-  Double_t sizeOfRollingWindow=4;  //Require that a lenda bar fired in both PMTS and one liquid scint
+  Double_t sizeOfRollingWindow=2;  //Require that a lenda bar fired in both PMTS 
   
   ////////////////////////////////////////////////////////////////////////////////////
   
@@ -205,8 +205,8 @@ int main(int argc, char **argv){
 	  
 
 
-
-	  /*if (TMath::Abs(timeDiff)<10){
+	  /*
+	  if (TMath::Abs(timeDiff)<10){
 	    for (int i=0;i<events.size();++i){
 	      cout<<"Event in list "<<i<<endl;
 	      cout<<"Channel is "<<events[i]->channel<<endl;
@@ -218,12 +218,12 @@ int main(int argc, char **argv){
 	    
 	    cout<<"TIME DIFF IS "<<timeDiff<<endl;
 	    int t;cin>>t;	  
-	  }*/
-	  
+	  }
+	  */
 
 	  
-	  timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
-	  //	  timeDiff = (events[1]->time -events[0]->time);
+	  //timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
+	  timeDiff = (events[1]->time -events[0]->time);	  
 	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
 	  if (TMath::Abs(timeDiff) <10){
 	    ///This is now a Good event
