@@ -7,25 +7,28 @@ SOURCES=$(shell ls ./src/*.cc)
 TEMP=$(shell ls ./src/*.cc~)
 TEMP2=$(shell ls ./include/*.hh~)
 OBJECTS=$(SOURCES:.cc=.o) 
-MAIN=GammaBuilder.C
-MAINO=./src/GammaBuilder.o
 
-EXECUTABLE=GammaBuilder
+EXE= GammaBuilder
+EXECUTABLE= $(EXE)$(LDFLAGS)
+MAIN=$(addsuffix .C,$(EXE))
+MAINO=./src/$(addsuffix .o,$(EXE))
+
 
 INCLUDEPATH=include
 SRCPATH=src
 ROOTCINT=rootcint
-DICTNAME    = SL_Event
-DICTOBJ     = $(addsuffix Dictionary.o, $(DICTNAME))
 
-EVENTLIB=/mnt/daqtesting/lenda/sam_analysis/LendaEvent/
+EVENTLIBPATH=/mnt/daqtesting/lenda/sam_analysis/LendaEvent/
+LIB=LendaEvent
+EVENTLIB=$(addsuffix $(LDFLAGS),$(LIB))
+
 .PHONY: clean get put all test sclean
 
 all: $(EXECUTABLE) 
 
 $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 	@echo "Building target" $@ "..." 
-	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIB) -lLendaEvent
+	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH) -l$(EVENTLIB)
 	@echo
 	@echo "Build succeed"
 
@@ -39,21 +42,16 @@ $(MAINO): $(MAIN)
 	@$(CXX) $(CFLAGS) $< -o $@  
 
 
-##%Dictionary.o: include/%.hh src/%LinkDef.h
-##	$(ROOTCINT) -f $(patsubst %.o,%.cc,$@) -c $^;
-##	$(CXX) -p -fPIC $(CFLAGS) -c $(patsubst %.o,%.cc,$@) $(patsubst %.o,%.h,$@)
-
-
 
 clean:
-	-rm ./$(OBJECTS)
-	-rm ./$(EXECUTABLE)
-	-rm ./$(MAINO)
+	-rm -f ./$(OBJECTS)
+	-rm -f ./$(EXECUTABLE)
+	-rm -f ./$(MAINO)
 
 sclean:
-	-rm ./$(TEMP)
-	-rm ./$(TEMP2)
-	-rm ./$(OBJECTS)
-	-rm ./$(EXECUTABLE)
-	-rm ./$(MAINO)
+	-rm  ./$(TEMP)
+	-rm  ./$(TEMP2)
+	-rm  ./$(OBJECTS)
+	-rm  ./$(EXECUTABLE)
+	-rm  ./$(MAINO)
 
