@@ -15,7 +15,7 @@ InputManager::InputManager()
   //set defualts
   runNum=-1;
   numFiles=1;//assume 1 file
-  fileNotes="4Ch-G";
+  fileNotes="4ChG";
   makeTraces=false;
   correction=false;
   maxEntry=-1;
