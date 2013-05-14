@@ -157,7 +157,7 @@ Double_t Filter::GetZeroCrossing(std::vector <Double_t> & CFD){
 	TMath::Abs(CFD[j] - CFD[j+1]) > 20 && j>20)
       {//zero crossing point
 	
-	softwareCFD =j+ CFD[j] / ( CFD[j] + TMath::Abs(CFD[j+1]) );
+	softwareCFD =CFD[j] / ( CFD[j] + TMath::Abs(CFD[j+1]) );
 	thisEventsZeroCrossings.push_back(softwareCFD);
 	
       }
@@ -169,6 +169,20 @@ Double_t Filter::GetZeroCrossing(std::vector <Double_t> & CFD){
 
   return thisEventsZeroCrossings[0]; // take the first one
 }
+
+
+
+Double_t Filter::GetZeroCubic(std::vector <Double_t> & CFD){
+
+
+
+
+  
+
+
+
+}
+
 
 
 Double_t Filter::fitTrace(std::vector <UShort_t> & trace,Double_t sigma,Double_t num){

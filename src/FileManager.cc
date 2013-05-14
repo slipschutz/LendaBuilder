@@ -16,7 +16,8 @@ FileManager::FileManager()
   fileName.str("Defualt");
 
   fileNotes="";//Default to nothing
-
+  timingMode="";//Defualt to nothing InputManager responsible for defualts
+  
 }
 
 TString FileManager::loadFile(Int_t runNum,Int_t fileNum) {
@@ -30,11 +31,11 @@ TString FileManager::loadFile(Int_t runNum,Int_t fileNum) {
   } else if (runNum <1000) {
     fileName<<"run-0"<< runNum;
   } else {
-    cout<<"Update run number parsing"<<endl; return "Crap";
+    cout<<"Update run number parsing"<<endl; return "-1";
   }
 
   
-  outputFileName << fileName.str()<<"-"<<fileNotes;
+  outputFileName << fileName.str()<<"-"<<fileNotes<<"-"<<timingMode;
 
   if (fileNum < 10){
     fileName<<"-0"<<fileNum;
@@ -54,7 +55,10 @@ TString FileManager::loadFile(Int_t runNum,Int_t fileNum) {
 }
 
 TFile * FileManager::getOutputFile(){
-
+  /*!
+    Most Basic output file format
+    Has only run-runNum-fileNotes-output.root
+   !*/
 
   outputFileName << "-output.root";
 
@@ -71,7 +75,11 @@ TFile * FileManager::getOutputFile(){
 }
 
 TFile * FileManager::getOutputFile(Double_t FL, Double_t FG, Double_t d, Double_t w){
-
+  /*!
+    
+    
+  !*/
+  
   std::stringstream st;
 
   st<<"FL"<<FL<<"FG"<<FG<<"d"<<d<<"w"<<w;

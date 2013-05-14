@@ -15,13 +15,13 @@ InputManager::InputManager()
   //set defualts
   runNum=-1;
   numFiles=1;//assume 1 file
-  fileNotes="4Channel-Gamma";
+  fileNotes="4Ch-G";
   makeTraces=false;
   correction=false;
   maxEntry=-1;
 
   specificFileName="";
-  timingMode="Not_in_use";
+  timingMode="softwareCFD";
   //defualt Filter settings see pixie manual
   FL=2;
   FG=0;
@@ -36,7 +36,7 @@ InputManager::InputManager()
   validTimingModes.push_back("internalCFD");
   validTimingModes.push_back("softwareCFD");
   validTimingModes.push_back("fitting");
-  validTimingModes.push_back("Not_in_use");
+
 
 }
 InputManager::~InputManager()
@@ -71,6 +71,7 @@ Bool_t InputManager::loadInputs(vector <string> & inputs){
   vector <string> flags;
   vector <string> arguments;
   vector <string> temp(2);
+  stringstream stream;
   //the first input has to be the run number
   
   if ( atoi(inputs[0].c_str() ) == 0 )
@@ -126,7 +127,7 @@ Bool_t InputManager::loadInputs(vector <string> & inputs){
     } else if (flags[i] == "sigma"){
       sigma = atof(arguments[i].c_str());ext_sigma_flag=true;
     } else if (flags[i]=="notes"){
-      fileNotes=arguments[i];
+      stream<<fileNotes<<"_"<<arguments[i];fileNotes=stream.str();
     } else if (flags[i]=="maxEntry"){
       maxEntry=atof(arguments[i].c_str());
     }else {
@@ -157,13 +158,9 @@ Bool_t InputManager::checkValues()
   }
   
   if (timingBool == false ){
-    //    nothingWrong =false;
-    //    dumpValidModes();
+    nothingWrong =false;
+    dumpValidModes();
   }
-  if (timingMode != "Not_in_use"){
-    cout<<"***Warning Timing mode specification is Obsolete.  Use notes:***"<<endl;
-  }
-
 
   if (correction==true && specificFileName==""){
     nothingWrong =false;
@@ -175,7 +172,6 @@ Bool_t InputManager::checkValues()
     cout<<"Specifying File only valid for correction run mode"<<endl;
   }
    
-    
 
   if (timingMode != "fitting" && ext_sigma_flag == true ){
     cout<<"Can't set sigma without setting the timingMode to fitting "<<endl;
