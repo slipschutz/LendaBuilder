@@ -24,6 +24,6 @@ public:
 
 
   string fileNotes;
-  
+  string timingMode;
 
 };

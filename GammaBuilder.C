@@ -78,7 +78,7 @@ int main(int argc, char **argv){
 
 
 
-
+  
 
   //prepare files and output tree
   ////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ int main(int argc, char **argv){
   TTree  *outT;
   FileManager * fileMan = new FileManager();
   fileMan->fileNotes = theInputManager.fileNotes;
-  
+  fileMan->timingMode =theInputManager.timingMode;
   //The input trees are put into a TChain
   TChain * inT;
   
@@ -137,8 +137,8 @@ int main(int argc, char **argv){
   UInt_t fUniqueID;
   UInt_t energy;
   Double_t time ; 
-  UInt_t timelow; // this used to be usgined long
-  UInt_t timehigh; // this used to be usgined long
+  ULong_t timelow; // this used to be usgined long
+  ULong_t timehigh; // this used to be usgined long
   UInt_t timecfd ; 
   LendaEvent* Event = new LendaEvent();
   
@@ -236,10 +236,14 @@ int main(int argc, char **argv){
 	      Double_t thisEventsIntegral=0; //intialize
 	      Double_t longGate=0; //intialize
 	      Double_t shortGate=0; //intialize
+	      thisEventsFF.clear();
+	      thisEventsCFD.clear();
 	      if ((events[i]->trace).size()!=0){ //if this event has a trace calculate filters and such
 		theFilter.FastFilter(events[i]->trace,thisEventsFF,FL,FG); //run FF algorithim
 		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
 		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD); //find zeroCrossig of CFD
+	
+	
 		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
 		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
 		longGate = theFilter.getGate(events[i]->trace,start,25);
@@ -250,6 +254,9 @@ int main(int argc, char **argv){
 	      }
 	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
                                                  //it is 0 if it isn't
+	      Event->pushFilter(thisEventsFF); //save filter if it is there
+	      Event->pushCFD(thisEventsCFD); //save CFD if it is there
+
 	      //Push other thing into the event
 	      Event->pushLongGate(longGate);
 	      Event->pushShortGate(shortGate);
