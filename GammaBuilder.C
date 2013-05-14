@@ -132,8 +132,8 @@ int main(int argc, char **argv){
   UInt_t fUniqueID;
   UInt_t energy;
   Double_t time ; 
-  ULong_t timelow; // this used to be usgined long
-  ULong_t timehigh; // this used to be usgined long
+  UInt_t timelow; // this used to be usgined long
+  UInt_t timehigh; // this used to be usgined long
   UInt_t timecfd ; 
   LendaEvent* Event = new LendaEvent();
   
@@ -245,7 +245,9 @@ int main(int argc, char **argv){
 		
 		events[i]->energy = thisEventsIntegral; // Over write the energy in this event with the
 		                                        // one calculated from the trace
-		events[i]->time = timelow +timehigh*TMath::Power(2.0,32.0) + softwareCFD; 
+		
+		events[i]->time = events[i]->timelow +events[i]->timehigh*4294967296.0 + softwareCFD; 
+
 	      }
 	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
                                                  //it is 0 if it isn't
@@ -259,6 +261,22 @@ int main(int argc, char **argv){
 	      Event->pushEnergy(events[i]->energy);
 	      Event->pushTime(events[i]->time);
 	    }
+
+	    /*	    for (int i=0;i<events.size();++i){
+              cout<<"Event in list "<<i<<endl;
+              cout<<"Channel is "<<events[i]->channel<<endl;
+              cout<<"Energy is "<<events[i]->energy<<endl;
+              cout<<"jentry is "<<events[i]->jentry<<endl;
+              cout<<"Time is "<<events[i]->time<<endl;
+              cout<<"\n";
+            }
+
+            cout<<"TIME DIFF IS "<<timeDiff<<endl;
+	    cout<<"New is "<<0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time)<<endl;
+            int t;cin>>t;
+	    */
+
+
 	    Event->Finalize(); //Finalize Calculates various parameters and applies corrections
 	    outT->Fill();     //Fill the tree
 	    Event->Clear();  //Always clear events. if you don't you are pushing events on top of other events
@@ -269,7 +287,7 @@ int main(int argc, char **argv){
     //Push this event (the jentry one in the tree) into the list of 
     //previous events.
     pushRollingWindow(previousEvents,sizeOfRollingWindow,
-		      time,chanid,trace,jentry,energy);
+		      time,timelow,timehigh,chanid,trace,jentry,energy);
     
     //Periodic printing
     if (jentry % 10000 == 0 )

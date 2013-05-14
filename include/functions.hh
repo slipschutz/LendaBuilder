@@ -11,6 +11,8 @@ struct Sl_Event {
   vector <UShort_t> trace;
   Long64_t jentry;
   Double_t time;
+  Double_t timelow;
+  Double_t timehigh;
   Double_t energy;
 };
 
@@ -51,7 +53,7 @@ Bool_t checkChannels(vector <Sl_Event> &in){
 }
 
 void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRollingWindow,
-		       Double_t &time,Int_t &chanid,vector <UShort_t>& trace,Long64_t &jentry,
+		       Double_t &time,Double_t timelow,Double_t timehigh,Int_t &chanid,vector <UShort_t>& trace,Long64_t &jentry,
 		       Double_t energy){
 
 
@@ -64,6 +66,8 @@ void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRolling
 	e.jentry=jentry;
 	e.time =time;
 	e.energy=energy;
+	e.timelow=timelow;
+	e.timehigh=timehigh;
 	previousEvents.push_back(e);
       }
     else if (previousEvents.size() >= sizeOfRollingWindow )
@@ -76,6 +80,8 @@ void pushRollingWindow(vector <Sl_Event> &previousEvents,Double_t &sizeOfRolling
 	e.jentry =jentry;
 	e.time=time;
 	e.energy=energy;
+	e.timelow=timelow;
+	e.timehigh=timehigh;
 	previousEvents.push_back(e);	  
       }
 
