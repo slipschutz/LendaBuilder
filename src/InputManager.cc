@@ -18,6 +18,7 @@ InputManager::InputManager()
   fileNotes="2Channel-Gamma";
   makeTraces=false;
   correction=false;
+  maxEntry=-1;
 
   specificFileName="";
   timingMode="Not_in_use";
@@ -126,6 +127,8 @@ Bool_t InputManager::loadInputs(vector <string> & inputs){
       sigma = atof(arguments[i].c_str());ext_sigma_flag=true;
     } else if (flags[i]=="notes"){
       fileNotes=arguments[i];
+    } else if (flags[i]=="maxEntry"){
+      maxEntry=atof(arguments[i].c_str());
     }else {
       cout<<flags[i] <<" :Unkown option"<<endl;
       return false;

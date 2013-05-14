@@ -1,0 +1,14 @@
+#!/bin/bash
+##
+## A wrapper allowing one to call GammaBuilder and have it chose the correct version
+## eiher GammaBuilder-m32 or GammaBuilder-m64
+##
+
+sys=$(uname -a | awk '{print $12}')
+
+if [ "${sys}" == "x86_64" ]; then
+~/analysis/GammaBuilder/GammaBuilder-m64 $1 $2 $3 $4 $5 $6 $7 $8 $9
+
+elif [ "${sys}" == "i686" ]; then 
+~/analysis/GammaBuilder/GammaBuilder-m32 $1 $2 $3 $4 $5 $6 $7 $8 $9
+fi

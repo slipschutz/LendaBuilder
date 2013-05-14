@@ -30,7 +30,7 @@ public:
   string specificFileName;
 
   Double_t sigma;
-
+  Long64_t maxEntry;
   Bool_t ext_sigma_flag;
 private:
   vector <string> split (const string &s, char delim, vector<string> &elems);
