@@ -63,7 +63,7 @@ int main(int argc, char **argv){
   Int_t runNum=theInputManager.runNum;
   Int_t numFiles=theInputManager.numFiles;
 
-  Long64_t maxentry=-1;
+  Long64_t maxentry=theInputManager.maxEntry;
 
   Bool_t makeTraces=theInputManager.makeTraces;
 
@@ -166,7 +166,8 @@ int main(int argc, char **argv){
   
   if(maxentry == -1)
     maxentry=nentry;
-
+  else if (maxentry > nentry)
+    maxentry=nentry;
 
   //non branch timing variables 
   ////////////////////////////////////////////////////////////////////////////////////
