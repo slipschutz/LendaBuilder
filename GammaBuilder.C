@@ -30,11 +30,6 @@
 #define BAD_NUM -10008
 
 
-
-
-
-
-
 using namespace std;
 
 
@@ -243,7 +238,6 @@ int main(int argc, char **argv){
 		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
 		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD); //find zeroCrossig of CFD
 	
-	
 		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
 		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
 		longGate = theFilter.getGate(events[i]->trace,start,25);
@@ -251,6 +245,7 @@ int main(int argc, char **argv){
 		
 		events[i]->energy = thisEventsIntegral; // Over write the energy in this event with the
 		                                        // one calculated from the trace
+		events[i]->time = timelow +timehigh*TMath::Power(2.0,32.0) + softwareCFD; 
 	      }
 	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
                                                  //it is 0 if it isn't
