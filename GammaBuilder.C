@@ -260,6 +260,8 @@ int main(int argc, char **argv){
 	      Event->pushChannel(events[i]->channel);
 	      Event->pushEnergy(events[i]->energy);
 	      Event->pushTime(events[i]->time);
+	      Event->pushSoftwareCFD(softwareCFD);
+	      Event->pushInternalCFD((events[i]->timecfd)/65536.0);
 	    }
 
 	    /*	    for (int i=0;i<events.size();++i){
@@ -287,7 +289,7 @@ int main(int argc, char **argv){
     //Push this event (the jentry one in the tree) into the list of 
     //previous events.
     pushRollingWindow(previousEvents,sizeOfRollingWindow,
-		      time,timelow,timehigh,chanid,trace,jentry,energy);
+		      time,timelow,timehigh,timecfd,chanid,trace,jentry,energy);
     
     //Periodic printing
     if (jentry % 10000 == 0 )
