@@ -155,7 +155,7 @@ int main(int argc, char **argv){
 
   ////////////////////////////////////////////////////////////////////////////////////
   vector <Sl_Event> previousEvents;
-  Double_t sizeOfRollingWindow=2;  //Require that a lenda bar fired in both PMTS 
+  Double_t sizeOfRollingWindow=4;  //Require that two lenda bar fired in both PMTS 
   
   ////////////////////////////////////////////////////////////////////////////////////
   
@@ -202,8 +202,8 @@ int main(int argc, char **argv){
 	  }
 
 	  
-	  //timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
-	  timeDiff = (events[1]->time -events[0]->time);	  
+	  timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
+	  //timeDiff = (events[1]->time -events[0]->time);	  
 	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
 	  if (TMath::Abs(timeDiff) <10){
 	    ///This is now a Good event
@@ -211,6 +211,7 @@ int main(int argc, char **argv){
 	    vector <Double_t> thisEventsFF;
 	    vector <Double_t> thisEventsCFD;
 	    
+
 	    for (int i=0;i<events.size();++i){
 	      Double_t thisEventsIntegral=0; //intialize
 	      Double_t longGate=0; //intialize
@@ -222,7 +223,7 @@ int main(int argc, char **argv){
 		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
 		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD)-traceDelay; //find zeroCrossig of CFD
 
-
+		
 		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
 		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
 		longGate = theFilter.getGate(events[i]->trace,start,25);
