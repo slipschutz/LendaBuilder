@@ -16,6 +16,7 @@
 #include "TSystem.h"
 #include "TGraph.h"
 #include "TChain.h"
+#include "TRandom2.h"
 
 //Local Headers
 #include "LendaEvent.hh"
@@ -71,7 +72,7 @@ int main(int argc, char **argv){
   int CFD_delay=theInputManager.d; //in clock ticks
   Double_t CFD_scale_factor =theInputManager.w;
 
-
+  Int_t traceDelay=50;//In clock ticks
 
   
 
@@ -107,7 +108,6 @@ int main(int argc, char **argv){
   if (extFlag == false && ext_sigma_flag==false) //if there are no flags
     outFile = fileMan->getOutputFile();
   else if (extFlag == true && ext_sigma_flag==false){
-    CFD_scale_factor = CFD_scale_factor/10.0; //bash script does things in whole numbers
     outFile = fileMan->getOutputFile(FL,FG,CFD_delay,CFD_scale_factor*10);
   } else if (extFlag==false && ext_sigma_flag==true){
     sigma=sigma/10;
@@ -177,6 +177,10 @@ int main(int argc, char **argv){
     inT->GetEntry(jentry); // Get the event from the input tree 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    //    cout<<"jentry is "<<jentry<<endl;
+    // cout<<"time low is "<<timelow<<endl;
+    ///int tt ; cin>>tt;
+
     if ( previousEvents.size() >= sizeOfRollingWindow ) {
       if ( checkChannels(previousEvents) )//prelinary check to see if there are 3 distinict channels in set
 	{ 
@@ -198,26 +202,6 @@ int main(int argc, char **argv){
 	  }
 
 	  
-	  
-
-
-	  /*
-	  if (TMath::Abs(timeDiff)<10){
-	    for (int i=0;i<events.size();++i){
-	      cout<<"Event in list "<<i<<endl;
-	      cout<<"Channel is "<<events[i]->channel<<endl;
-	      cout<<"Energy is "<<events[i]->energy<<endl;
-	      cout<<"jentry is "<<events[i]->jentry<<endl;
-	      cout<<"Time is "<<events[i]->time<<endl;
-	      cout<<"\n";
-	    }
-	    
-	    cout<<"TIME DIFF IS "<<timeDiff<<endl;
-	    int t;cin>>t;	  
-	  }
-	  */
-
-	  
 	  //timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
 	  timeDiff = (events[1]->time -events[0]->time);	  
 	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
@@ -226,18 +210,19 @@ int main(int argc, char **argv){
 	    //Run filters and such on these events 
 	    vector <Double_t> thisEventsFF;
 	    vector <Double_t> thisEventsCFD;
-
+	    
 	    for (int i=0;i<events.size();++i){
 	      Double_t thisEventsIntegral=0; //intialize
 	      Double_t longGate=0; //intialize
 	      Double_t shortGate=0; //intialize
-	      thisEventsFF.clear();
-	      thisEventsCFD.clear();
+	      thisEventsFF.clear(); //clear
+	      thisEventsCFD.clear();//clear
 	      if ((events[i]->trace).size()!=0){ //if this event has a trace calculate filters and such
 		theFilter.FastFilter(events[i]->trace,thisEventsFF,FL,FG); //run FF algorithim
 		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
-		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD); //find zeroCrossig of CFD
-	
+		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD)-traceDelay; //find zeroCrossig of CFD
+
+
 		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
 		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
 		longGate = theFilter.getGate(events[i]->trace,start,25);
@@ -246,7 +231,7 @@ int main(int argc, char **argv){
 		events[i]->energy = thisEventsIntegral; // Over write the energy in this event with the
 		                                        // one calculated from the trace
 		
-		events[i]->time = events[i]->timelow +events[i]->timehigh*4294967296.0 + softwareCFD; 
+		events[i]->softTime = events[i]->timelow +events[i]->timehigh*4294967296.0 + softwareCFD; 
 
 	      }
 	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
@@ -255,29 +240,16 @@ int main(int argc, char **argv){
 	      Event->pushCFD(thisEventsCFD); //save CFD if it is there
 
 	      //Push other thing into the event
-	      Event->pushLongGate(longGate);
-	      Event->pushShortGate(shortGate);
-	      Event->pushChannel(events[i]->channel);
+	      Event->pushLongGate(longGate); //longer integration window
+	      Event->pushShortGate(shortGate);//shorter integration window
+	      Event->pushChannel(events[i]->channel);//the channel for this pulse
 	      Event->pushEnergy(events[i]->energy);
 	      Event->pushTime(events[i]->time);
+	      Event->pushSoftTime(events[i]->softTime);
 	      Event->pushSoftwareCFD(softwareCFD);
 	      Event->pushInternalCFD((events[i]->timecfd)/65536.0);
+	      Event->pushEntryNum(events[i]->jentry);
 	    }
-
-	    /*	    for (int i=0;i<events.size();++i){
-              cout<<"Event in list "<<i<<endl;
-              cout<<"Channel is "<<events[i]->channel<<endl;
-              cout<<"Energy is "<<events[i]->energy<<endl;
-              cout<<"jentry is "<<events[i]->jentry<<endl;
-              cout<<"Time is "<<events[i]->time<<endl;
-              cout<<"\n";
-            }
-
-            cout<<"TIME DIFF IS "<<timeDiff<<endl;
-	    cout<<"New is "<<0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time)<<endl;
-            int t;cin>>t;
-	    */
-
 
 	    Event->Finalize(); //Finalize Calculates various parameters and applies corrections
 	    outT->Fill();     //Fill the tree
@@ -294,7 +266,7 @@ int main(int argc, char **argv){
     //Periodic printing
     if (jentry % 10000 == 0 )
       cout<<"On event "<<jentry<<endl;
-  
+    
 }//End main analysis loop
   
 

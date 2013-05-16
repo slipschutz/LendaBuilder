@@ -11,6 +11,7 @@ struct Sl_Event {
   vector <UShort_t> trace;
   Long64_t jentry;
   Double_t time;
+  Double_t softTime;
   Double_t timelow;
   Double_t timehigh;
   Double_t timecfd;

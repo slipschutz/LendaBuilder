@@ -26,20 +26,23 @@ void Filter::FastFilter(std::vector <UShort_t> &trace,std::vector <Double_t> &th
   Double_t sumNum1=0;
   Double_t sumNum2=0;
   
+  int start =2*FL+FG-1;
   
   for (int i=0;i< (int) trace.size();i++)
     {
-      for (int j= i-(FL-1) ;j<i;j++)
-	{
-	  if (j>=0)
-	    sumNum1 = sumNum1+ trace[j];
-	}
-
-      for (int j=i-(2*FL+FG-1);j<i-(FL+FG);j++)
-	{
-	  if (j>=0)
-	    sumNum2 = sumNum2+ trace[j];
-	}
+      if (i>=start){
+	for (int j= i-(FL-1) ;j<i;j++)
+	  {
+	    if (j>=0)
+	      sumNum1 = sumNum1+ trace[j];
+	  }
+	
+	for (int j=i-(2*FL+FG-1);j<i-(FL+FG);j++)
+	  {
+	    if (j>=0)
+	      sumNum2 = sumNum2+ trace[j];
+	  }
+      }
       thisEventsFF.push_back(sumNum1-sumNum2);
       sumNum1=0;
       sumNum2=0;
@@ -134,7 +137,9 @@ std::vector <Double_t> Filter::CFD(std::vector <Double_t> &thisEventsFF,
 
   std::vector <Double_t> thisEventsCFD;
   thisEventsCFD.resize(thisEventsFF.size(),0);
-  
+
+
+
   for (int j=0;j<(int) thisEventsFF.size() - CFD_delay;j++) {
     thisEventsCFD[j+CFD_delay] = thisEventsFF[j+CFD_delay] - 
       thisEventsFF[j]/ ( TMath::Power(2,CFD_scale_factor+1) );
@@ -157,7 +162,7 @@ Double_t Filter::GetZeroCrossing(std::vector <Double_t> & CFD){
 	TMath::Abs(CFD[j] - CFD[j+1]) > 20 && j>20)
       {//zero crossing point
 	
-	softwareCFD =CFD[j] / ( CFD[j] + TMath::Abs(CFD[j+1]) );
+	softwareCFD =j + CFD[j] / ( CFD[j] + TMath::Abs(CFD[j+1]) );
 	thisEventsZeroCrossings.push_back(softwareCFD);
 	
       }
@@ -165,7 +170,9 @@ Double_t Filter::GetZeroCrossing(std::vector <Double_t> & CFD){
 
   if (thisEventsZeroCrossings.size() == 0)
     thisEventsZeroCrossings.push_back(BAD_NUM);
- 
+
+  if (thisEventsZeroCrossings.size() != 1 )
+    return -1;
 
   return thisEventsZeroCrossings[0]; // take the first one
 }
