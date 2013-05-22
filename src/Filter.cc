@@ -178,18 +178,90 @@ Double_t Filter::GetZeroCrossing(std::vector <Double_t> & CFD){
 }
 
 
-
+#include <map>
+#include "TMatrixD.h"
 Double_t Filter::GetZeroCubic(std::vector <Double_t> & CFD){
 
 
+  std::map <double,int> zeroCrossings;
+  double max=0;
 
+  for (int i =0;i<(int)CFD.size()-1;i++){
+    if (CFD[i]>0 && CFD[i+1]<0){
+      double val = CFD[i] - CFD[i+1];
+      if ( val > max)
+	max = val;
+      //put this crossing in map
+      zeroCrossings[val]=i;
+    }
+  }
 
+  int theSpotAbove = zeroCrossings[max];
+  Double_t x[4];
+  TMatrixD Y(4,1);//a column vector
   
+  for (int i=0;i<4;i++){
+    x[i]= theSpotAbove -1+ i; //first point is the one before zerocrossing
+    Y[i][0]=CFD[ theSpotAbove -1+i];
+  }
 
 
+  TMatrixD A(4,4);//declare 4 by 4 matrix
 
+  for (int row=0;row<4;row++){
+    for (int col=0;col<4;col++){
+      A[row][col]= pow(x[row],3-col);
+    }
+  }
+
+  //  A.Print();
+
+  TMatrixD invertA = A.Invert();
+
+  // invertA.Print();
+
+  TMatrixD Coeffs(4,1);
+  Coeffs = invertA*Y;
+  
+  //cout<<"COEFFS are "<<endl;
+  //Coeffs.Print();
+
+  //the x[1] is theSpot above so start there
+  bool notDone =true;
+  double left = x[1];//initial above
+  double right =x[2];//initial below
+  double valUp = getFunc(Coeffs,left);
+  double valDown =getFunc(Coeffs,right);
+
+
+  while (notDone){
+    
+    if (TMath::Abs(TMath::Abs(valUp)-TMath::Abs(valDown) ) <0.001)
+      notDone = false;
+  
+    double mid = (left+right)/2.0;
+    double midVal = getFunc(Coeffs,mid);
+
+
+    if (midVal > 0)
+      left=mid;
+    else 
+      right=mid;
+    
+    valUp = getFunc(Coeffs,left);
+    valDown =getFunc(Coeffs,right);
+  }
+
+  return left;
 }
 
+double Filter::getFunc(TMatrixD Coeffs,double x){
+  double total =0;
+  for (int i=0;i<4;i++){
+    total = total + Coeffs[i][0]*TMath::Power(x,3-i);
+  }
+  return total;
+}
 
 
 Double_t Filter::fitTrace(std::vector <UShort_t> & trace,Double_t sigma,Double_t num){

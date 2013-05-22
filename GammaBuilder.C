@@ -45,14 +45,14 @@ int main(int argc, char **argv){
     return 0;
   }  
   
-  InputManager theInputManager;
-  if ( !  theInputManager.loadInputs(inputs) ){
+  InputManager theInputManager; 
+  if ( !  theInputManager.loadInputs(inputs) ){//load options and check everything
     return 0;
   }
   
   ////////////////////////////////////////////////////////////////////////////////////
 
-  //load correcctions and settings
+  //load settings
   
   Double_t sigma=theInputManager.sigma; // the sigma used in the fitting option
 
@@ -155,7 +155,7 @@ int main(int argc, char **argv){
 
   ////////////////////////////////////////////////////////////////////////////////////
   vector <Sl_Event> previousEvents;
-  Double_t sizeOfRollingWindow=4;  //Require that two lenda bar fired in both PMTS 
+  Double_t sizeOfRollingWindow=2;  //Require that two lenda bar fired in both PMTS 
   
   ////////////////////////////////////////////////////////////////////////////////////
   
@@ -167,6 +167,8 @@ int main(int argc, char **argv){
   //non branch timing variables 
   ////////////////////////////////////////////////////////////////////////////////////
   Double_t softwareCFD;
+  Double_t cubicCFD;
+
   Filter theFilter; // Filter object
   ////////////////////////////////////////////////////////////////////////////////////
   
@@ -202,8 +204,8 @@ int main(int argc, char **argv){
 	  }
 
 	  
-	  timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
-	  //timeDiff = (events[1]->time -events[0]->time);	  
+	  //timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
+	  timeDiff = (events[1]->time -events[0]->time);	  
 	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
 	  if (TMath::Abs(timeDiff) <10){
 	    ///This is now a Good event
@@ -221,20 +223,22 @@ int main(int argc, char **argv){
 	      if ((events[i]->trace).size()!=0){ //if this event has a trace calculate filters and such
 		theFilter.FastFilter(events[i]->trace,thisEventsFF,FL,FG); //run FF algorithim
 		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
-		softwareCFD = theFilter.GetZeroCrossing(thisEventsCFD)-traceDelay; //find zeroCrossig of CFD
+		 
+		softwareCFD=theFilter.GetZeroCrossing(thisEventsCFD)-traceDelay; //find zeroCrossig of CFD
 
-		
+		cubicCFD = theFilter.GetZeroCubic(thisEventsCFD)-traceDelay;
+
 		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
 		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
 		longGate = theFilter.getGate(events[i]->trace,start,25);
 		shortGate = theFilter.getGate(events[i]->trace,start,14);
 		
-		events[i]->energy = thisEventsIntegral; // Over write the energy in this event with the
-		                                        // one calculated from the trace
+		
 		
 		events[i]->softTime = events[i]->timelow +events[i]->timehigh*4294967296.0 + softwareCFD; 
 
 	      }
+
 	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
                                                  //it is 0 if it isn't
 	      Event->pushFilter(thisEventsFF); //save filter if it is there
@@ -244,10 +248,12 @@ int main(int argc, char **argv){
 	      Event->pushLongGate(longGate); //longer integration window
 	      Event->pushShortGate(shortGate);//shorter integration window
 	      Event->pushChannel(events[i]->channel);//the channel for this pulse
-	      Event->pushEnergy(events[i]->energy);
+	      Event->pushEnergy(thisEventsIntegral);;//push trace energy if there
+	      Event->pushInternEnergy(events[i]->energy);//push internal energy
 	      Event->pushTime(events[i]->time);
 	      Event->pushSoftTime(events[i]->softTime);
 	      Event->pushSoftwareCFD(softwareCFD);
+	      Event->pushCubicTime(events[i]->timelow +events[i]->timehigh*4294967296.0+cubicCFD);
 	      Event->pushInternalCFD((events[i]->timecfd)/65536.0);
 	      Event->pushEntryNum(events[i]->jentry);
 	    }

@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "TFile.h"
-
+#include "TMatrixD.h"
 
 
 class Filter {
@@ -36,6 +36,8 @@ public:
   Double_t getEnergy(std::vector <UShort_t> &trace);
 
   Double_t getGate(std::vector <UShort_t> &trace,int start,int L);
+
+  double getFunc(TMatrixD, double);
 
   Double_t numOfBadFits;
 

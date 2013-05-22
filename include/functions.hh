@@ -43,8 +43,8 @@ Bool_t checkChannels(vector <Sl_Event> &in){
       }
     }
   }
-
-  if (count == 4 && liq_scint_count==0 )
+  //  if (count == 4 && liq_scint_count==0 )
+  if ((ch[0] && ch[1]) || (ch[2] &&ch[3]))
     return true;
   else
     return false;
