@@ -18,9 +18,13 @@ INCLUDEPATH=include
 SRCPATH=src
 ROOTCINT=rootcint
 
+## .so libraries
 EVENTLIBPATH=/mnt/daqtesting/lenda/sam_analysis/LendaEvent/
 LIB=LendaEvent
 EVENTLIB=$(addsuffix $(LDFLAGS),$(LIB))
+DDASCHANNELPATH=/mnt/daqtesting/lenda/sam_analysis/ddasChannel/
+CHLIB=ddaschannel
+CHEVENTLIB=$(addsuffix $(LDFLAGS),$(CHLIB))
 
 .PHONY: clean get put all test sclean
 
@@ -28,7 +32,8 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 	@echo "Building target" $@ "..." 
-	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH) -l$(EVENTLIB)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH)\
+	 -l$(EVENTLIB) -L$(DDASCHANNELPATH) -l$(CHEVENTLIB)
 	@echo
 	@echo "Build succeed"
 

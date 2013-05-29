@@ -20,6 +20,7 @@
 
 //Local Headers
 #include "LendaEvent.hh"
+#include "ddaschannel.h"
 #include "Filter.hh"
 #include "FileManager.h"
 #include "InputManager.hh"
@@ -49,6 +50,9 @@ int main(int argc, char **argv){
   if ( !  theInputManager.loadInputs(inputs) ){//load options and check everything
     return 0;
   }
+
+
+
   
   ////////////////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +101,7 @@ int main(int argc, char **argv){
     }
   }
   
-  inT->SetMakeClass(1);//This does something
+  
   
   Long64_t nentry=(Long64_t) (inT->GetEntries());
   cout <<"The number of entires is : "<< nentry << endl ;
@@ -123,40 +127,23 @@ int main(int argc, char **argv){
     }
   ////////////////////////////////////////////////////////////////////////////////////
   
-  Int_t numOfChannels=4;  
+  
+  
   // set input tree branvh variables and addresses
   ////////////////////////////////////////////////////////////////////////////////////
-  Int_t chanid;
-  Int_t slotid;
-  vector<UShort_t> trace;
-  UInt_t fUniqueID;
-  UInt_t energy;
-  Double_t time ; 
-  UInt_t timelow; // this used to be usgined long
-  UInt_t timehigh; // this used to be usgined long
-  UInt_t timecfd ; 
-  LendaEvent* Event = new LendaEvent();
-  
-  //In put tree branches    
-  inT->SetBranchAddress("chanid", &chanid);
-  inT->SetBranchAddress("fUniqueID", &fUniqueID);
-  inT->SetBranchAddress("energy", &energy);
-  inT->SetBranchAddress("timelow", &timelow);
-  inT->SetBranchAddress("timehigh", &timehigh);
-  inT->SetBranchAddress("trace", &trace);
-  inT->SetBranchAddress("timecfd", &timecfd);
-  inT->SetBranchAddress("slotid", &slotid);
-  inT->SetBranchAddress("time", &time);
-  
+  ddaschannel * inChannel = new ddaschannel();
+  inT->SetBranchAddress("dchan",&inChannel);
+
   
   //Specify the output branch
+  LendaEvent* Event = new LendaEvent();
   outT->Branch("Event",&Event);
   //  outT->BranchRef();
 
   ////////////////////////////////////////////////////////////////////////////////////
-  vector <Sl_Event> previousEvents;
+
   Double_t sizeOfRollingWindow=2;  //Require that two lenda bar fired in both PMTS 
-  
+ 
   ////////////////////////////////////////////////////////////////////////////////////
   
   if(maxentry == -1)
@@ -171,122 +158,161 @@ int main(int argc, char **argv){
 
   Filter theFilter; // Filter object
   ////////////////////////////////////////////////////////////////////////////////////
-  
-  
+
+
+  //  vector <Sl_Event*> CorrelatedEvents(4,NULL);
+  map <Long64_t,bool> mapOfUsedEntries;//Used to prevent double counting
+  Sl_Event jentryEvent;
+  vector <Sl_Event> EventsInWindow;
+
 
   for (Long64_t jentry=0; jentry<maxentry;jentry++) { // Main analysis loop
-    
+
     inT->GetEntry(jentry); // Get the event from the input tree 
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    jentryEvent.jentry=jentry;
+    jentryEvent.dchan2 = ddaschannel(*inChannel);//make new one so it doesn't
+    bool searching;                              //get overwritten by inT->GetEntry
+    if (jentry < maxentry-1)
+      searching =true;
+    else
+      searching=false;
+    int countForward=1;//start at the next one
+    vector <Long64_t> JitteredEventNums;
 
-    //    cout<<"jentry is "<<jentry<<endl;
-    // cout<<"time low is "<<timelow<<endl;
-    ///int tt ; cin>>tt;
+    //put the jentryEvent in the window of events
+    EventsInWindow.push_back(jentryEvent);
+    while (searching){
+      inT->GetEntry(jentry+countForward);//read event into inChannel
 
-    if ( previousEvents.size() >= sizeOfRollingWindow ) {
-      if ( checkChannels(previousEvents) )//prelinary check to see if there are 3 distinict channels in set
-	{ 
-	  
-	  //for cable arrangement independance
-	  //sort the last size of rolling window evens by channel
-	  vector <Sl_Event*> events_extra(20,(Sl_Event*)0);
-	  vector <Sl_Event*> events;
-	  Double_t start;
-	  Double_t timeDiff;
-	  
-	  for (int i=0;i<previousEvents.size();++i){
-	    events_extra[previousEvents[i].channel]=&(previousEvents[i]);
-	  }
-	  for (int i=0;i<events_extra.size();++i){
-	    if (events_extra[i] != 0 ){
-	      events.push_back(events_extra[i]);
-	    }
-	  }
+      if ( TMath::Abs(jentryEvent.dchan2.time - inChannel->time) < 10){
+	//if still in the window do add to list of events in window 
+	Sl_Event temp;
+	temp.jentry = jentry +countForward;
+	temp.dchan2= ddaschannel(*inChannel);
+	//	mapOfUsedEntries[temp.jentry]=true;
+	EventsInWindow.push_back(temp);
+	
+      }else{
+	searching =false;
+	jentry = jentry+countForward-1;
+      }
 
-	  
-	  //timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
-	  timeDiff = (events[1]->time -events[0]->time);	  
-	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
-	  if (TMath::Abs(timeDiff) <10){
-	    ///This is now a Good event
-	    //Run filters and such on these events 
-	    vector <Double_t> thisEventsFF;
-	    vector <Double_t> thisEventsCFD;
-	    
-
-	    for (int i=0;i<events.size();++i){
-	      Double_t thisEventsIntegral=0; //intialize
-	      Double_t longGate=0; //intialize
-	      Double_t shortGate=0; //intialize
-	      thisEventsFF.clear(); //clear
-	      thisEventsCFD.clear();//clear
-	      if ((events[i]->trace).size()!=0){ //if this event has a trace calculate filters and such
-		theFilter.FastFilter(events[i]->trace,thisEventsFF,FL,FG); //run FF algorithim
-		thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
-		 
-		softwareCFD=theFilter.GetZeroCrossing(thisEventsCFD)-traceDelay; //find zeroCrossig of CFD
-
-		cubicCFD = theFilter.GetZeroCubic(thisEventsCFD)-traceDelay;
-
-		start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
-		thisEventsIntegral = theFilter.getEnergy(events[i]->trace);
-		longGate = theFilter.getGate(events[i]->trace,start,25);
-		shortGate = theFilter.getGate(events[i]->trace,start,14);
-		
-		
-		
-		events[i]->softTime = events[i]->timelow +events[i]->timehigh*4294967296.0 + softwareCFD; 
-
-	      }
-
-	      Event->pushTrace(events[i]->trace);//save the trace for later if its there
-                                                 //it is 0 if it isn't
-	      Event->pushFilter(thisEventsFF); //save filter if it is there
-	      Event->pushCFD(thisEventsCFD); //save CFD if it is there
-
-	      //Push other thing into the event
-	      Event->pushLongGate(longGate); //longer integration window
-	      Event->pushShortGate(shortGate);//shorter integration window
-	      Event->pushChannel(events[i]->channel);//the channel for this pulse
-	      Event->pushEnergy(thisEventsIntegral);;//push trace energy if there
-	      Event->pushInternEnergy(events[i]->energy);//push internal energy
-	      Event->pushTime(events[i]->time);
-	      Event->pushSoftTime(events[i]->softTime);
-	      Event->pushSoftwareCFD(softwareCFD);
-	      Event->pushCubicTime(events[i]->timelow +events[i]->timehigh*4294967296.0+cubicCFD);
-	      Event->pushInternalCFD((events[i]->timecfd)/65536.0);
-	      Event->pushEntryNum(events[i]->jentry);
-	    }
-
-	    Event->Finalize(); //Finalize Calculates various parameters and applies corrections
-	    outT->Fill();     //Fill the tree
-	    Event->Clear();  //Always clear events. if you don't you are pushing events on top of other events
-	  }//end timeDiff if
-	}//end checkChannels if
-    } // end rolling window section
-    
-    //Push this event (the jentry one in the tree) into the list of 
-    //previous events.
-    pushRollingWindow(previousEvents,sizeOfRollingWindow,
-		      time,timelow,timehigh,timecfd,chanid,trace,jentry,energy);
-    
+      if (countForward >20){
+	cout<<"***Warding run away loop***"<<endl;
+      }
+      
+      countForward++;
+    }//end while
+    if (EventsInWindow.size()>1){
+      packEvent(Event,EventsInWindow,theFilter,FL,FG,CFD_delay,CFD_scale_factor);
+      Event->Finalize();
+      outT->Fill();
+      Event->Clear();
+    }
+    EventsInWindow.clear();
+ 
     //Periodic printing
     if (jentry % 10000 == 0 )
       cout<<"On event "<<jentry<<endl;
     
-}//End main analysis loop
+  }//End main analysis loop
   
 
-//Write the tree to file 
-outT->Write();
-//Close the file
-outFile->Close();
-
-cout<<"Number of bad fits "<<theFilter.numOfBadFits<<endl;
-
-cout<<"\n\n**Finished**\n\n";
-
-return  0;
+  //Write the tree to file 
+  outT->Write();
+  //Close the file
+  outFile->Close();
+  
+  cout<<"Number of bad fits "<<theFilter.numOfBadFits<<endl;
+  
+  cout<<"\n\n**Finished**\n\n";
+  
+  return  0;
 
 }
 
+
+/*
+else { //out side of window plus clock tic
+	searching =false;// stop looping 
+	if (JitteredEventNums.size()==0){
+	  jentry =jentry+countForward-1;
+	} else {
+	  //should go back to first jitter event
+	  for (int i=0;i<JitteredEventNums.size();i++){
+	    cout<<JitteredEventNums[i]<<endl;
+	  }
+	  jentry = JitteredEventNums[0]-1;
+	  cout<<"in jittered land"<<endl;
+	  int t ;cin>>t;
+	  
+	}
+      }
+
+ */
+
+/*
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    if (CorrelatedEvents[inChannel->chanid]==NULL){
+      Sl_Event *e=new Sl_Event();
+      e->jentry=jentry;
+      e->dchan =  new ddaschannel(*inChannel);//copy the info
+      CorrelatedEvents[inChannel->chanid] =e;
+    } else {
+      if (TMath::Abs(CorrelatedEvents[inChannel->chanid]->dchan->time 
+		     -inChannel->time)<10){
+	//repeat channel within window throw away
+	delete CorrelatedEvents[inChannel->chanid];
+	CorrelatedEvents[inChannel->chanid]=NULL;
+      }else {
+	//update the spot if the current event happened after the stored one
+	//ie keep the most recent one
+	delete CorrelatedEvents[inChannel->chanid];
+	Sl_Event *e=new Sl_Event();
+	e->jentry=jentry;
+	e->dchan =  new ddaschannel(*inChannel);//copy the info
+	CorrelatedEvents[inChannel->chanid] =e;
+      }
+    }
+  
+  
+    //bar 11 check
+    if(CorrelatedEvents[0]!=NULL && CorrelatedEvents[1] !=NULL&&
+       TMath::Abs(CorrelatedEvents[0]->dchan->time - CorrelatedEvents[1]->dchan->time)<10){
+       for (int i=0;i<2;i++){
+	cout<<"I is "<<i<<endl;
+	cout<<"Jentry "<<CorrelatedEvents[i]->jentry<<endl;
+	cout<<"time is "<<CorrelatedEvents[i]->dchan->time<<endl;
+	}
+      vector<Sl_Event*>::const_iterator first = CorrelatedEvents.begin() + 0;
+      vector<Sl_Event*>::const_iterator last = CorrelatedEvents.begin() + 2;
+
+      vector<Sl_Event*> newVec(first, last);
+      packEvent(Event,newVec,theFilter,FL,FG,CFD_delay,CFD_scale_factor);
+      outT->Fill();
+      Event->Clear();
+      delete CorrelatedEvents[0];CorrelatedEvents[0]=NULL;
+      delete CorrelatedEvents[1];CorrelatedEvents[1]=NULL;
+    }
+
+    //bar 23 check
+    if(CorrelatedEvents[2]!=NULL && CorrelatedEvents[3] !=NULL&&
+       TMath::Abs(CorrelatedEvents[2]->dchan->time - CorrelatedEvents[3]->dchan->time)<10){
+      for (int i=2;i<4;i++){
+	cout<<"I is "<<i<<endl;
+	cout<<"Jentry "<<CorrelatedEvents[i]->jentry<<endl;
+	cout<<"time is "<<CorrelatedEvents[i]->dchan->time<<endl;
+	}
+      vector<Sl_Event*>::const_iterator first = CorrelatedEvents.begin() + 2;
+      vector<Sl_Event*>::const_iterator last = CorrelatedEvents.begin() + 4;
+
+      vector<Sl_Event*> newVec(first, last);
+      packEvent(Event,newVec,theFilter,FL,FG,CFD_delay,CFD_scale_factor);
+      outT->Fill();
+      Event->Clear();
+      //remove those events from CorrelatedEvents to prevent over counting
+      delete CorrelatedEvents[2];CorrelatedEvents[2]=NULL;
+      delete CorrelatedEvents[3];CorrelatedEvents[3]=NULL;
+
+    }
+*/
