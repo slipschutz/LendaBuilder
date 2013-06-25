@@ -139,10 +139,9 @@ std::vector <Double_t> Filter::CFD(std::vector <Double_t> &thisEventsFF,
   thisEventsCFD.resize(thisEventsFF.size(),0);
 
 
-
   for (int j=0;j<(int) thisEventsFF.size() - CFD_delay;j++) {
     thisEventsCFD[j+CFD_delay] = thisEventsFF[j+CFD_delay] - 
-      thisEventsFF[j]/ ( TMath::Power(2,CFD_scale_factor+1) );
+      thisEventsFF[j]/ ( TMath::Power(2,CFD_scale_factor+2) );
   }
 
   return thisEventsCFD;

@@ -1,1 +1,1 @@
-../../LendaEvent/LendaEvent.hh
+/user/lipschut/Introspective/LendaEvent.hh

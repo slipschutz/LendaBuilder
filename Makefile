@@ -19,7 +19,8 @@ SRCPATH=src
 ROOTCINT=rootcint
 
 ## .so libraries
-EVENTLIBPATH=/mnt/daqtesting/lenda/sam_analysis/LendaEvent/
+#EVENTLIBPATH=/mnt/daqtesting/lenda/sam_analysis/LendaEvent/
+EVENTLIBPATH=/user/lipschut/Introspective
 LIB=LendaEvent
 EVENTLIB=$(addsuffix $(LDFLAGS),$(LIB))
 DDASCHANNELPATH=/mnt/daqtesting/lenda/sam_analysis/ddasChannel/
@@ -53,6 +54,8 @@ clean:
 	-rm -f ./$(EXECUTABLE)
 	-rm -f ./$(MAINO)
 
+test:
+	echo $(EVENTLIBPATH)
 sclean:
 	-rm  ./$(TEMP)
 	-rm  ./$(TEMP2)

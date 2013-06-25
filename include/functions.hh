@@ -120,7 +120,7 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       
       cubicCFD = theFilter.GetZeroCubic(thisEventsCFD)-traceDelay;
       
-      start = TMath::Floor(softwareCFD) -5; // the start point in the trace for the gates
+      start = TMath::Floor(softwareCFD)+traceDelay -5; // the start point in the trace for the gates
       thisEventsIntegral = theFilter.getEnergy(events[i]->dchan2.trace);
       // longGate = theFilter.getGate(events[i]->dchan->trace,start,25);
       // shortGate = theFilter.getGate(events[i]->dchan->trace,start,14);
@@ -146,7 +146,7 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
     Event->pushEntryNum(events[i]->jentry);
   }
   
-  Event->Finalize(); //Finalize Calculates various parameters and applies corrections
+  //  Event->Finalize(); //Finalize Calculates various parameters and applies corrections
  
  
 }

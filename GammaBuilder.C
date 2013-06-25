@@ -198,7 +198,13 @@ int main(int argc, char **argv){
       }
 
       if (countForward >20){
-	cout<<"***Warding run away loop***"<<endl;
+	cout<<"***Warning run away loop***"<<endl;
+	cout<<"***Loop started at "<<jentry<<"***"<<endl;
+	cout<<"***Kill loop. Restarting at "<<jentry+1<<"***"<<endl;
+	jentry=1+jentry;
+	EventsInWindow.clear();
+	searching = false;
+	
       }
       
       countForward++;
