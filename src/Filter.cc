@@ -31,22 +31,30 @@ void Filter::FastFilter(std::vector <UShort_t> &trace,std::vector <Double_t> &th
   for (int i=0;i< (int) trace.size();i++)
     {
       if (i>=start){
-	for (int j= i-(FL-1) ;j<i;j++)
+	for (int j= i-(FL-1) ;j<=i;j++)
 	  {
 	    if (j>=0)
 	      sumNum1 = sumNum1+ trace[j];
+	    else 
+	      cout<<"Oh NO"<<endl;
 	  }
 	
-	for (int j=i-(2*FL+FG-1);j<i-(FL+FG);j++)
+	for (int j=i-(2*FL+FG-1);j<=i-(FL+FG);j++)
 	  {
 	    if (j>=0)
 	      sumNum2 = sumNum2+ trace[j];
+	    else
+	      cout<<"oh no"<<endl;
 	  }
       }
+
+
       thisEventsFF.push_back(sumNum1-sumNum2);
+
       sumNum1=0;
       sumNum2=0;
     }//End for    
+
 }
 
 
