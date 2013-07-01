@@ -248,7 +248,7 @@ Double_t Filter::GetZeroCubic(std::vector <Double_t> & CFD){
   
     double mid = (left+right)/2.0;
     double midVal = getFunc(Coeffs,mid);
-
+ 
 
     if (midVal > 0)
       left=mid;

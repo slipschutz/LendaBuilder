@@ -47,7 +47,7 @@ int main(int argc, char **argv){
   }  
   
   InputManager theInputManager; 
-  if ( !  theInputManager.loadInputs(inputs) ){//load options and check everything
+  if ( !  theInputManager.loadInputs2(inputs) ){//load options and check everything
     return 0;
   }
 
@@ -210,7 +210,7 @@ int main(int argc, char **argv){
       countForward++;
     }//end while
     if (EventsInWindow.size()>1){
-      packEvent(Event,EventsInWindow,theFilter,FL,FG,CFD_delay,CFD_scale_factor);
+      packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       outT->Fill();
       Event->Clear();

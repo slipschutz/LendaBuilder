@@ -83,9 +83,13 @@ void pushRollingWindow(vector <Sl_Event> &previousEvents,ddaschannel *dchan,Long
 }
 
 void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
-	       Filter theFilter,Double_t FL, Double_t FG,
-	       int CFD_delay,Double_t CFD_scale_factor){
-  
+	       Filter theFilter,InputManager& inMan){
+  Double_t FL =inMan.FL;
+  Double_t FG=inMan.FG;
+  int CFD_delay=inMan.d;
+  Double_t CFD_scale_factor=inMan.w;
+
+  bool lean =inMan.lean;
   //sort the events by channel
   
   vector <Sl_Event*> events2(16,NULL);
@@ -126,12 +130,12 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       // shortGate = theFilter.getGate(events[i]->dchan->trace,start,14);
             
     }
-    
-    Event->pushTrace(events[i]->dchan2.trace);//save the trace for later if its there
-    //it is 0 if it isn't
-    Event->pushFilter(thisEventsFF); //save filter if it is there
-    Event->pushCFD(thisEventsCFD); //save CFD if it is there
-
+    if (lean == false){
+      Event->pushTrace(events[i]->dchan2.trace);//save the trace for later if its there
+      //it is 0 if it isn't
+      Event->pushFilter(thisEventsFF); //save filter if it is there
+      Event->pushCFD(thisEventsCFD); //save CFD if it is there
+    }
     //Push other thing into the event
     Event->pushLongGate(longGate); //longer integration window
     Event->pushShortGate(shortGate);//shorter integration window
