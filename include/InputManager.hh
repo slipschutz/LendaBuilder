@@ -28,6 +28,10 @@ public:
   string fileNotes;
   string timingMode;
   Double_t FL,FG,d,w;
+  Double_t traceDelay;
+  
+  Double_t timeWindow;
+
   
   Bool_t reMakePulseShape;
 
@@ -36,6 +40,8 @@ public:
   string specificFileName;
 
   Bool_t lean;
+  Bool_t fast;
+
   Double_t maxEntry;
 
   Double_t sigma;

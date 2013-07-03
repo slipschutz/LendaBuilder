@@ -25,8 +25,8 @@
 #include "FileManager.h"
 #include "InputManager.hh"
 #include "CorrectionManager.hh"
-
-
+#include <ctime>
+#include <iomanip>
 
 #include "functions.hh"
 #define BAD_NUM -10008
@@ -65,7 +65,7 @@ int main(int argc, char **argv){
 
   Long64_t maxentry=theInputManager.maxEntry;
 
-  Bool_t makeTraces=theInputManager.makeTraces;
+  
 
   Bool_t extFlag=theInputManager.ext_flag;
   Bool_t ext_sigma_flag=theInputManager.ext_sigma_flag;
@@ -76,7 +76,7 @@ int main(int argc, char **argv){
   int CFD_delay=theInputManager.d; //in clock ticks
   Double_t CFD_scale_factor =theInputManager.w;
 
-  Int_t traceDelay=50;//In clock ticks
+
 
   
 
@@ -142,7 +142,7 @@ int main(int argc, char **argv){
 
   ////////////////////////////////////////////////////////////////////////////////////
 
-  Double_t sizeOfRollingWindow=2;  //Require that two lenda bar fired in both PMTS 
+
  
   ////////////////////////////////////////////////////////////////////////////////////
   
@@ -152,9 +152,8 @@ int main(int argc, char **argv){
     maxentry=nentry;
 
   //non branch timing variables 
-  ////////////////////////////////////////////////////////////////////////////////////
-  Double_t softwareCFD;
-  Double_t cubicCFD;
+     ////////////////////////////////////////////////////////////////////////////////////
+
 
   Filter theFilter; // Filter object
   ////////////////////////////////////////////////////////////////////////////////////
@@ -164,8 +163,13 @@ int main(int argc, char **argv){
   map <Long64_t,bool> mapOfUsedEntries;//Used to prevent double counting
   Sl_Event jentryEvent;
   vector <Sl_Event> EventsInWindow;
+  
+  clock_t startTime;
+  clock_t otherTime;
+  double timeRate=0;
+  bool timeFlag=true;
 
-
+  startTime = clock();
   for (Long64_t jentry=0; jentry<maxentry;jentry++) { // Main analysis loop
 
     inT->GetEntry(jentry); // Get the event from the input tree 
@@ -184,7 +188,7 @@ int main(int argc, char **argv){
     while (searching){
       inT->GetEntry(jentry+countForward);//read event into inChannel
 
-      if ( TMath::Abs(jentryEvent.dchan2.time - inChannel->time) < 10){
+      if ( TMath::Abs(jentryEvent.dchan2.time - inChannel->time) < theInputManager.timeWindow ){
 	//if still in the window do add to list of events in window 
 	Sl_Event temp;
 	temp.jentry = jentry +countForward;
@@ -218,8 +222,19 @@ int main(int argc, char **argv){
     EventsInWindow.clear();
  
     //Periodic printing
-    if (jentry % 10000 == 0 )
-      cout<<"On event "<<jentry<<endl;
+    if (jentry % 10000 <10 && jentry >=20000 && timeFlag){
+
+      timeFlag=false;
+      otherTime=clock();
+      timeRate = TMath::Abs( double((startTime-otherTime))/double(CLOCKS_PER_SEC));
+
+      timeRate = timeRate/jentry;
+
+    }
+    //Periodic printing
+    if (jentry % 10000 ==0 )
+      cout<<"On event "<<setw(9)<<jentry<<" "<<setprecision(3)<<setw(4)<<((double)jentry)/maxentry*100.0<<"% seconds remaining "<<setprecision(4)<<setw(6)<<timeRate*(maxentry-jentry)<<flush<<"\r";
+
     
   }//End main analysis loop
   

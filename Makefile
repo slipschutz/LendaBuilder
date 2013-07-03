@@ -7,6 +7,7 @@ SOURCES=$(shell ls ./src/*.cc)
 TEMP=$(shell ls ./src/*.cc~)
 TEMP2=$(shell ls ./include/*.hh~)
 OBJECTS=$(SOURCES:.cc=.o) 
+HEADERS=$(SOURCES:.cc=.hh)
 
 EXE= GammaBuilder
 EXECUTABLE= $(EXE)$(LDFLAGS)
@@ -43,11 +44,12 @@ $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 	@echo "Compiling" $< "..."
 	@$(CXX) $(CFLAGS) $< -o $@ 
 
-$(MAINO): $(MAIN)
+$(MAINO): $(MAIN) $(HEADERS)
 	@echo "Compiling" $< "..."
 	@$(CXX) $(CFLAGS) $< -o $@  
 
-
+%.hh: 
+	@echo ""
 
 clean:
 	-rm -f ./$(OBJECTS)

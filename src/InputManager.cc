@@ -24,7 +24,12 @@ InputManager::InputManager()
   FG=0;
   d=3; //in clock ticks
   w =0.25;
+  traceDelay=50;
   ext_flag=false;//defualt to none meta run format
+  
+  timeWindow=10; //defualt time window to be 100 ns
+  
+
 
   long_gate =25;
   short_gate=14;
@@ -32,7 +37,10 @@ InputManager::InputManager()
   sigma=1.0;
   maxEntry=-1;
   ext_sigma_flag=false;
+
+  fast=false;
   lean=false;
+
   validTimingModes.push_back("internalCFD");
   validTimingModes.push_back("softwareCFD");
   validTimingModes.push_back("fitting");
@@ -53,10 +61,14 @@ void InputManager::BuildInputMap(){
   ValidNumericalInputs["lg"]=&long_gate;
   ValidNumericalInputs["sg"]=&short_gate;
   ValidNumericalInputs["maxentry"]=&maxEntry;
+  ValidNumericalInputs["timewindow"]=&timeWindow;
+  ValidNumericalInputs["tracedelay"]=&traceDelay;
   
+
   // ValidBoolInputs["remake"]=&reMakePulseShape;
 
   ValidBoolInputs["lean"]=&lean;
+  ValidBoolInputs["fast"]=&fast;
 
   ValidStringInputs["timingmode"]=&timingMode;
   ValidStringInputs["inputfile"]=&specificFileName;

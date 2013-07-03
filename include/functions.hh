@@ -88,16 +88,22 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
   Double_t FG=inMan.FG;
   int CFD_delay=inMan.d;
   Double_t CFD_scale_factor=inMan.w;
+  Double_t traceDelay=inMan.traceDelay;
 
   bool lean =inMan.lean;
   //sort the events by channel
   
   vector <Sl_Event*> events2(16,NULL);
   vector <Sl_Event*> events;
-  for (int i=0;i<inEvents.size();i++){
-    events2[inEvents[i].dchan2.chanid]=&inEvents[i];
+
+  for (int i=0;i<(int)inEvents.size();i++){
+    if (events2[inEvents[i].dchan2.chanid] == NULL )
+      events2[inEvents[i].dchan2.chanid]=&inEvents[i];
+    else
+      cout<<"CRAP"<<endl;
+
   }
-  for (int i=0;i<events2.size();i++){
+  for (int i=0;i<(int)events2.size();i++){
     if (events2[i] !=NULL )
       events.push_back(events2[i]);
   }
@@ -105,18 +111,18 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
 
   vector <Double_t> thisEventsFF;
   vector <Double_t> thisEventsCFD;
-  for (int i=0;i<events.size();++i){
+  for (int i=0;i<(int)events.size();++i){
     Double_t thisEventsIntegral=0; //intialize
     Double_t longGate=0; //intialize
     Double_t shortGate=0; //intialize
     Double_t cubicCFD=0;
     Double_t softwareCFD=0;
-    Double_t traceDelay=50;
+
     Double_t start=0;
 
     thisEventsFF.clear(); //clear
     thisEventsCFD.clear();//clear
-    if ((events[i]->dchan2.trace).size()!=0){ //if this event has a trace calculate filters and such
+    if ((events[i]->dchan2.trace).size()!=0 &&inMan.fast==false){ //if this event has a trace calculate filters and such
       theFilter.FastFilter(events[i]->dchan2.trace,thisEventsFF,FL,FG); //run FF algorithim
       thisEventsCFD = theFilter.CFD(thisEventsFF,CFD_delay,CFD_scale_factor); //run CFD algorithim
       
