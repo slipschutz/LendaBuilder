@@ -4,7 +4,7 @@
 #include "InputManager.hh"
 #include <vector>
 #include <string>
-
+#include <iomanip>
 
 //
 
@@ -28,7 +28,7 @@ InputManager::InputManager()
   ext_flag=false;//defualt to none meta run format
   
   timeWindow=10; //defualt time window to be 100 ns
-  
+  timeWindowShift=0;//shift time window defaulted to 0
 
 
   long_gate =25;
@@ -64,6 +64,9 @@ void InputManager::BuildInputMap(){
   ValidNumericalInputs["timewindow"]=&timeWindow;
   ValidNumericalInputs["tracedelay"]=&traceDelay;
   
+  ValidNumericalInputs["timewindowshift"]=&timeWindowShift;
+  ValidNumericalInputs["twshift"]=&timeWindowShift;
+  
 
   // ValidBoolInputs["remake"]=&reMakePulseShape;
 
@@ -79,6 +82,13 @@ void InputManager::BuildInputMap(){
 
 Bool_t InputManager::loadInputs2(vector <string> & inputs){
 
+  for (int i=0;i<(int)inputs.size();i++){
+    if (lowerCase(inputs[i]) == "help"){
+      DumpAllOpitions();
+      return false;
+    }
+  }
+  
   vector <string> Flags;
   vector <string> Arguments;
 
@@ -86,12 +96,13 @@ Bool_t InputManager::loadInputs2(vector <string> & inputs){
   vector <string> temp(2,"");
   //the first input has to be the run number
   
-  if ( atoi(inputs[0].c_str() ) == 0 )
+  if ( atoi(inputs[0].c_str() ) == 0 ){
     cout<<"Must supply a integer runNumber"<<endl;
-  else
+    return false;
+  } else
     runNum = atoi(inputs[0].c_str());
 
-  cout<<"num of inputs is "<<inputs.size()<<endl;
+
   
   for (int i =1;i<(int) inputs.size();++i){
     
@@ -141,7 +152,7 @@ Bool_t InputManager::loadInputs2(vector <string> & inputs){
 
   }
 
-  Print();
+  PrintValues();
 
   return checkValues();
 }
@@ -285,4 +296,57 @@ void InputManager::Print(){
   cout<<"w "<<w<<endl;
   cout<<"filename "<<specificFileName<<endl;
 
+}
+
+
+void InputManager::PrintValues(){
+  
+  int width=15;
+  
+  cout<<"\n####Settings for Builder####\n"<<endl;
+
+  for (map<string,Double_t *>::iterator ii=ValidNumericalInputs.begin();
+       ii!=ValidNumericalInputs.end();ii++){
+    cout<<"Flag "<<setw(width)<<ii->first<<"   Value "<<setw(width)<<*ii->second<<endl;
+  }
+
+  
+  for (map<string,Bool_t *>::iterator ii=ValidBoolInputs.begin();
+       ii!=ValidBoolInputs.end();ii++){
+    cout<<"Flag "<<setw(width)<<ii->first<<"   Value "<<setw(width)<<*ii->second<<endl;
+  }
+
+  
+  for (map<string,string *>::iterator ii=ValidStringInputs.begin();
+       ii!=ValidStringInputs.end();ii++){
+    cout<<"Flag "<<setw(width)<<ii->first<<"   Value "<<setw(width)<<*ii->second<<endl;
+  }
+  
+  cout<<"\n############################\n"<<endl;
+}
+
+void InputManager::DumpAllOpitions(){
+
+  int width =15;
+  cout<<"\n####Valid Option Information for Corrector####\n"<<endl;
+
+  cout<<"\nValid Flags that take numerical inputs are: \n"<<endl;
+  for (map<string,Double_t *>::iterator ii=ValidNumericalInputs.begin();
+       ii!=ValidNumericalInputs.end();ii++){
+    cout<<"Flag "<<setw(width)<<ii->first<<" Default Value "<<setw(width)<<*ii->second<<endl;
+  }
+
+  cout<<"\nValid Flags that take bool inputs are: \n"<<endl;
+  for (map<string,Bool_t *>::iterator ii=ValidBoolInputs.begin();
+       ii!=ValidBoolInputs.end();ii++){
+    cout<<"Flag "<<setw(width)<<ii->first<<" Default Value "<<setw(width)<<*ii->second<<endl;
+  }
+
+  cout<<"\nValid Flags that take string inputs are: \n"<<endl;
+  for (map<string,string *>::iterator ii=ValidStringInputs.begin();
+       ii!=ValidStringInputs.end();ii++){
+    cout<<"Flag "<<setw(width)<<ii->first<<" Default Value "<<setw(width)<<*ii->second<<endl;
+  }
+
+  cout<<"\n#############################################\n"<<endl;
 }

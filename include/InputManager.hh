@@ -31,7 +31,7 @@ public:
   Double_t traceDelay;
   
   Double_t timeWindow;
-
+  Double_t timeWindowShift;
   
   Bool_t reMakePulseShape;
 
@@ -63,5 +63,6 @@ private:
   
   vector<string> validTimingModes;
   void dumpValidModes();
-
+  void PrintValues();
+  void DumpAllOpitions();
 };
