@@ -34,8 +34,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 	@echo "Building target" $@ "..." 
-	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH)\
-	 -l$(EVENTLIB) -L$(DDASCHANNELPATH) -l$(CHEVENTLIB)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH) -l$(EVENTLIB) -L$(DDASCHANNELPATH) -l$(CHEVENTLIB)
 	@echo
 	@echo "Build succeed"
 
@@ -49,7 +48,7 @@ $(MAINO): $(MAIN) $(HEADERS)
 	@$(CXX) $(CFLAGS) $< -o $@  
 
 %.hh: 
-	@echo ""
+	@
 
 clean:
 	-rm -f ./$(OBJECTS)

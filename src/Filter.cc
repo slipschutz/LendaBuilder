@@ -62,7 +62,7 @@ void Filter:: FastFilterFull(std::vector <UShort_t> &trace,
 			     std::vector <Double_t> &thisEventsFF,
 			     Double_t FL,Double_t FG,Double_t decayTime)
 {
-
+  /*
   Double_t S0, Sg, S1; // Varibale names from Tan paper
   
   Double_t deltaT = 1; //1 clock tick
@@ -117,12 +117,12 @@ void Filter:: FastFilterFull(std::vector <UShort_t> &trace,
     }
     
      
-    /*    A0= S0 / (r1*(1-Power(b1,FL)));
+      A0= S0 / (r1*(1-Power(b1,FL)));
     
     J=(Power(b1,FL)*(1-Power(b1,FG))*S0 )/ (Power(b1,FL)-1) +Sg;
     
     A1=(1/r1)*( (Power(b1,FL+FG)*S0)/(Power(b1,FL)-1) - S1/(Power(b1,FL)-1));
-    */
+  
     
     Double_t a0,ag,a1;
     ag=1;
@@ -135,7 +135,7 @@ void Filter:: FastFilterFull(std::vector <UShort_t> &trace,
     }
   }
 
-
+*/
 }
 
 
@@ -365,7 +365,7 @@ Double_t Filter::getEnergy(std::vector <UShort_t> &trace){
 }
 Double_t Filter::getGate(std::vector <UShort_t> &trace,int start,int L){
 
-  int size = trace.size();
+
   int range =L;
   int  window = floor( trace.size()/10.0);
   Double_t bgk=0;

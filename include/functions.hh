@@ -38,7 +38,7 @@ Bool_t checkChannels(vector <Sl_Event>&EventsInWindow,
   map <int,Long64_t> entries;
   
   bool duplicateChannelsInWindow=false;
-  for (int i=0;i<EventsInWindow.size();i++){
+  for (int i=0;i<(int)EventsInWindow.size();i++){
     ch[EventsInWindow[i].dchan2.chanid].push_back(true);
     entries[i]=EventsInWindow[i].jentry;
     
@@ -57,7 +57,7 @@ Bool_t checkChannels(vector <Sl_Event>&EventsInWindow,
   cout<<(ch[2].size()==1 && ch[3].size()==1)<<endl;
   
   cout<<"The entries "<<endl;
-  for (int i=0;i<entries.size();i++)
+  for (int i=0;i<(int)entries.size();i++)
     cout<<"entry i "<<entries[i]<<endl;
   
 
@@ -71,6 +71,7 @@ Bool_t checkChannels(vector <Sl_Event>&EventsInWindow,
   } else {
     return false;
   }
+  return false;
 }
 
 void pushRollingWindow(vector <Sl_Event> &previousEvents,ddaschannel *dchan,Long64_t jentry){
@@ -132,8 +133,8 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       
       start = TMath::Floor(softwareCFD)+traceDelay -5; // the start point in the trace for the gates
       thisEventsIntegral = theFilter.getEnergy(events[i]->dchan2.trace);
-      // longGate = theFilter.getGate(events[i]->dchan->trace,start,25);
-      // shortGate = theFilter.getGate(events[i]->dchan->trace,start,14);
+      longGate = theFilter.getGate(events[i]->dchan2.trace,start,25);
+      shortGate = theFilter.getGate(events[i]->dchan2.trace,start,14);
             
     }
     if (lean == false){

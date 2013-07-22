@@ -24,7 +24,7 @@ void CorrectionManager::addEntry(string tag,double val){
 int CorrectionManager::findEntry(string tag){
 
   int spot=-1;
-  for (int i=0;i<theCorrections.size();++i){
+  for (int i=0;i<(int)theCorrections.size();++i){
     if (theCorrections[i].tag == tag ){
       spot =i;
       break;
@@ -81,7 +81,7 @@ void CorrectionManager::loadFile(int runNum){
 CorrectionManager::CorrectionManager(){}
 
 void CorrectionManager::dump(){
-  for (int i =0;i<theCorrections.size();++i)
+  for (int i =0;i<(int)theCorrections.size();++i)
     cout<<"Tag "<<theCorrections[i].tag<<" Value "<<theCorrections[i].value<<endl;
 
 }
