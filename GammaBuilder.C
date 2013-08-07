@@ -188,7 +188,8 @@ int main(int argc, char **argv){
     while (searching){
       inT->GetEntry(jentry+countForward);//read event into inChannel
 
-      if ( TMath::Abs(jentryEvent.dchan2.time - inChannel->time) < theInputManager.timeWindow ){
+      if ( TMath::Abs(jentryEvent.dchan2.time - inChannel->time) < theInputManager.timeWindowShift+theInputManager.timeWindow &&
+	   TMath::Abs(jentryEvent.dchan2.time - inChannel->time) > theInputManager.timeWindowShift){
 	//if still in the window do add to list of events in window 
 	Sl_Event temp;
 	temp.jentry = jentry +countForward;

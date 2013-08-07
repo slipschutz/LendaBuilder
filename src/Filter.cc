@@ -240,12 +240,12 @@ Double_t Filter::GetZeroCubic(std::vector <Double_t> & CFD){
   double valUp = getFunc(Coeffs,left);
   double valDown =getFunc(Coeffs,right);
 
-
+  int loopCount=0;
   while (notDone){
-    
+    loopCount++;
     if (TMath::Abs(TMath::Abs(valUp)-TMath::Abs(valDown) ) <0.001)
       notDone = false;
-  
+      
     double mid = (left+right)/2.0;
     double midVal = getFunc(Coeffs,mid);
  
@@ -257,7 +257,14 @@ Double_t Filter::GetZeroCubic(std::vector <Double_t> & CFD){
     
     valUp = getFunc(Coeffs,left);
     valDown =getFunc(Coeffs,right);
+    if (loopCount >30 ){//kill stuck loop
+      notDone=false;
+      left =BAD_NUM;
+    }
+
   }
+
+
 
   return left;
 }
