@@ -30,6 +30,7 @@ InputManager::InputManager()
   timeWindow=10; //defualt time window to be 100 ns
   timeWindowShift=0;//shift time window defaulted to 0
 
+  fileNotes="";
 
   long_gate =25;
   short_gate=14;
@@ -75,7 +76,7 @@ void InputManager::BuildInputMap(){
 
   ValidStringInputs["timingmode"]=&timingMode;
   ValidStringInputs["inputfile"]=&specificFileName;
-  
+  ValidStringInputs["notes"]=&fileNotes;
 
 }
 

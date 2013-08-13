@@ -12,3 +12,5 @@ if [ "${sys}" == "x86_64" ]; then
 elif [ "${sys}" == "i686" ]; then 
 ~/analysis/GammaBuilder/GammaBuilder-m32 $1 $2 $3 $4 $5 $6 $7 $8 $9
 fi
+
+~/analysis/GammaBuilder/GammaBuilder-m64 $1 $2 $3 $4 $5 $6 $7 $8 $9

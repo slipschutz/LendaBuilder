@@ -214,7 +214,7 @@ int main(int argc, char **argv){
       
       countForward++;
     }//end while
-    if (EventsInWindow.size()>1){
+    if (EventsInWindow.size()>=2){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       outT->Fill();

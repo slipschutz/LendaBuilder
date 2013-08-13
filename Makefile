@@ -1,5 +1,5 @@
 CXX=$(shell root-config --cxx)
-CFLAGS=-c -g -Wall $(shell root-config --cflags) -I./src -I ./include
+CFLAGS=-c -g -Wall $(shell root-config --cflags) -I./src -I ./include -O3
 LDLIBS=$(shell root-config --glibs)
 LDFLAGS=$(shell root-config --ldflags)
 #SOURCES=./src/SL_Event.cc ./src/FileManager.cc ./src/Filter.cc
@@ -7,7 +7,7 @@ SOURCES=$(shell ls ./src/*.cc)
 TEMP=$(shell ls ./src/*.cc~)
 TEMP2=$(shell ls ./include/*.hh~)
 OBJECTS=$(SOURCES:.cc=.o) 
-HEADERS=$(SOURCES:.cc=.hh)
+HEADERS=$(shell ls ./include/*h*)
 
 EXE= GammaBuilder
 EXECUTABLE= $(EXE)$(LDFLAGS)
@@ -41,7 +41,7 @@ $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 
 .cc.o:
 	@echo "Compiling" $< "..."
-	@$(CXX) $(CFLAGS) $< -o $@ 
+	$(CXX) $(CFLAGS) $< -o $@ 
 
 $(MAINO): $(MAIN) $(HEADERS)
 	@echo "Compiling" $< "..."
@@ -56,7 +56,8 @@ clean:
 	-rm -f ./$(MAINO)
 
 test:
-	echo $(EVENTLIBPATH)
+	@echo $(EVENTLIBPATH)
+	@echo $(HEADERS)
 sclean:
 	-rm  ./$(TEMP)
 	-rm  ./$(TEMP2)
