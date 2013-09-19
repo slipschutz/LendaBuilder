@@ -102,7 +102,7 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       events2[inEvents[i].dchan2.chanid]=&inEvents[i];
     else {
       events2.insert(events2.begin()+inEvents[i].dchan2.chanid,&inEvents[i]);
-
+      cout<<"CRAP"<<endl;
     }
   }
   for (int i=0;i<(int)events2.size();i++){
@@ -137,7 +137,7 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       
       cubicCFD = theFilter.GetZeroCubic(thisEventsCFD)-traceDelay;
       
-      start = TMath::Floor(softwareCFD)+traceDelay -5; // the start point in the trace for the gates
+      start = TMath::Floor(softwareCFD)+traceDelay -1; // the start point in the trace for the gates
       thisEventsIntegral = theFilter.getEnergy(events[i]->dchan2.trace);
       longGate = theFilter.getGate(events[i]->dchan2.trace,start,25);
       shortGate = theFilter.getGate(events[i]->dchan2.trace,start,14);

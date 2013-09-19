@@ -181,27 +181,51 @@ int main(int argc, char **argv){
     else
       searching=false;
     int countForward=1;//start at the next one
-    vector <Long64_t> JitteredEventNums;
+    int countForwardNoDelay=1;//count until end of window ignorin timewindow shift
+
 
     //put the jentryEvent in the window of events
     EventsInWindow.push_back(jentryEvent);
     while (searching){
       inT->GetEntry(jentry+countForward);//read event into inChannel
+      Double_t TimeDiff =TMath::Abs(jentryEvent.dchan2.time - inChannel->time); // Time between current event and first in window
+      
+      if ( theInputManager.timeWindowShift == 0 ){ // no shift
+	if (TimeDiff < theInputManager.timeWindow){
+	  //if still in the window do add to list of events in window 
+	  Sl_Event temp;
+	  temp.jentry = jentry +countForward;
+	  temp.dchan2= ddaschannel(*inChannel);
 
-      if ( TMath::Abs(jentryEvent.dchan2.time - inChannel->time) < theInputManager.timeWindowShift+theInputManager.timeWindow &&
-	   TMath::Abs(jentryEvent.dchan2.time - inChannel->time) > theInputManager.timeWindowShift){
-	//if still in the window do add to list of events in window 
-	Sl_Event temp;
-	temp.jentry = jentry +countForward;
-	temp.dchan2= ddaschannel(*inChannel);
-	//	mapOfUsedEntries[temp.jentry]=true;
-	EventsInWindow.push_back(temp);
-	
-      }else{
-	searching =false;
-	jentry = jentry+countForward-1;
+	  EventsInWindow.push_back(temp);
+	  countForward++;
+	}else{
+	  searching =false;
+	  jentry = jentry+countForward-1;
+	}
+      } else {  // when there is a time window input
+	if ( TimeDiff < theInputManager.timeWindow){
+	  countForwardNoDelay++;
+	}
+
+	if (TimeDiff < theInputManager.timeWindowShift){
+	  //while it is less than the shift count 
+	  countForward++;
+	} else if ( TimeDiff > theInputManager.timeWindowShift && 
+		    TimeDiff < theInputManager.timeWindowShift + theInputManager.timeWindow){
+	  //push events in the delayed time window
+	  Sl_Event temp;
+	  temp.jentry = jentry +countForward;
+	  temp.dchan2= ddaschannel(*inChannel);
+	  
+	  EventsInWindow.push_back(temp);
+	  countForward++;
+	} else{ 
+	  searching =false;
+	  jentry = jentry+countForwardNoDelay-1;
+	}
       }
-
+      
       if (countForward >20){
 	cout<<"***Warning run away loop***"<<endl;
 	cout<<"***Loop started at "<<jentry<<"***"<<endl;
@@ -209,16 +233,14 @@ int main(int argc, char **argv){
 	jentry=1+jentry;
 	EventsInWindow.clear();
 	searching = false;
-	
       }
       
-      countForward++;
     }//end while
     if (EventsInWindow.size()>=2){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       outT->Fill();
-      Event->Clear();
+      Event->Clear();//always clear the lenda event
     }
     EventsInWindow.clear();
  
@@ -234,7 +256,7 @@ int main(int argc, char **argv){
     }
     //Periodic printing
     if (jentry % 10000 ==0 )
-      cout<<"On event "<<setw(9)<<jentry<<" "<<setprecision(3)<<setw(4)<<((double)jentry)/maxentry*100.0<<"% seconds remaining "<<setprecision(4)<<setw(6)<<timeRate*(maxentry-jentry)<<flush<<"\r";
+      cout<<right<<"On event "<<setw(9)<<jentry<<" "<<setprecision(2)<<setw(3)<<((double)jentry)/maxentry*100.0<<"% seconds remaining "<<setprecision(4)<<setw(6)<<timeRate*(maxentry-jentry)<<flush<<"\r";
 
     
   }//End main analysis loop
@@ -250,9 +272,50 @@ int main(int argc, char **argv){
   cout<<"\n\n**Finished**\n\n";
   
   return  0;
-
+  
 }
 
+
+
+/*
+
+
+
+      if ( TimeDiff < theInputManager.timeWindow ){
+	countForwardNoDelay++;//just the count up to the end of the window ignoring the shift
+	if ( TimeDiff <theInputManager.timeWindowShift){
+	//if still in the window but less than the shift just count up until the shift 
+	  countForward++;
+	} else if (TimeDiff > theInputManager.timeWindowShift){
+	  //if it is less than the window and greater than the shift count AND push the events
+	  //this section is where events are pushed when there is no window shift
+	  Sl_Event temp;
+	  temp.jentry = jentry +countForward;
+	  temp.dchan2= ddaschannel(*inChannel);
+	  //	mapOfUsedEntries[temp.jentry]=true;
+	  EventsInWindow.push_back(temp);
+	  countForward++;
+	}
+      }else if (TimeDiff > theInputManager.timeWindow && TimeDiff< theInputManager.timeWindowShift){
+	//just count if you are inbetween end of window and start of delay
+	countForward++;
+      }else if (TimeDiff>theInputManager.timeWindow && TimeDiff > theInputManager.timeWindowShift&&
+		TimeDiff <theInputManager.timeWindow+theInputManager.timeWindowShift){
+	//push events when there is a shift and you are in the shifted time window 
+	  Sl_Event temp;
+	  temp.jentry = jentry +countForward;
+	  temp.dchan2= ddaschannel(*inChannel);
+	  //	mapOfUsedEntries[temp.jentry]=true;
+	  EventsInWindow.push_back(temp);
+	  countForward++;
+      } else{
+	searching =false;
+	jentry = jentry+countForward-1;
+      }
+    
+
+
+ */
 
 /*
 else { //out side of window plus clock tic
