@@ -10,7 +10,7 @@ OBJECTS=$(SOURCES:.cc=.o)
 HEADERS=$(shell ls ./include/*h*)
 
 EXE= GammaBuilder
-EXECUTABLE= $(EXE)$(LDFLAGS)
+EXECUTABLE= $(EXE)
 MAIN=$(addsuffix .C,$(EXE))
 MAINO=./src/$(addsuffix .o,$(EXE))
 
