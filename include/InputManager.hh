@@ -43,6 +43,7 @@ public:
   Bool_t fast;
 
   Double_t maxEntry;
+  Double_t startEntry;
 
   Double_t sigma;
 

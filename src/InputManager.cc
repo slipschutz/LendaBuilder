@@ -42,6 +42,8 @@ InputManager::InputManager()
   fast=false;
   lean=false;
 
+  startEntry=0;
+
   validTimingModes.push_back("internalCFD");
   validTimingModes.push_back("softwareCFD");
   validTimingModes.push_back("fitting");
@@ -67,7 +69,7 @@ void InputManager::BuildInputMap(){
   
   ValidNumericalInputs["timewindowshift"]=&timeWindowShift;
   ValidNumericalInputs["twshift"]=&timeWindowShift;
-  
+  ValidNumericalInputs["startentry"]=&startEntry;
 
   // ValidBoolInputs["remake"]=&reMakePulseShape;
 
@@ -329,7 +331,7 @@ void InputManager::PrintValues(){
 void InputManager::DumpAllOpitions(){
 
   int width =15;
-  cout<<"\n####Valid Option Information for Corrector####\n"<<endl;
+  cout<<"\n####Valid Option Information for Builder####\n"<<endl;
 
   cout<<"\nValid Flags that take numerical inputs are: \n"<<endl;
   for (map<string,Double_t *>::iterator ii=ValidNumericalInputs.begin();

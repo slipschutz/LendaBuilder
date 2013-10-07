@@ -140,7 +140,7 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       start = TMath::Floor(softwareCFD)+traceDelay -1; // the start point in the trace for the gates
       thisEventsIntegral = theFilter.getEnergy(events[i]->dchan2.trace);
       longGate = theFilter.getGate(events[i]->dchan2.trace,start,inMan.long_gate);
-      shortGate = theFilter.getGate(events[i]->dchan2.trace,start,inMan.long_gate);
+      shortGate = theFilter.getGate(events[i]->dchan2.trace,start,inMan.short_gate);
             
     }
     if (lean == false){

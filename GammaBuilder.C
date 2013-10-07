@@ -170,7 +170,7 @@ int main(int argc, char **argv){
   bool timeFlag=true;
 
   startTime = clock();
-  for (Long64_t jentry=0; jentry<maxentry;jentry++) { // Main analysis loop
+  for (Long64_t jentry=theInputManager.startEntry; jentry<maxentry;jentry++) { // Main analysis loop
 
     inT->GetEntry(jentry); // Get the event from the input tree 
     jentryEvent.jentry=jentry;
@@ -225,9 +225,10 @@ int main(int argc, char **argv){
 	  jentry = jentry+countForwardNoDelay-1;
 	}
       }
-      
+
+
       if (countForward >20){
-	cout<<"***Warning run away loop***"<<endl;
+ 	cout<<"***Warning run away loop***"<<endl;
 	cout<<"***Loop started at "<<jentry<<"***"<<endl;
 	cout<<"***Kill loop. Restarting at "<<jentry+1<<"***"<<endl;
 	jentry=1+jentry;

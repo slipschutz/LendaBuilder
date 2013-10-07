@@ -45,11 +45,13 @@ TString FileManager::loadFile(Int_t runNum,Int_t fileNum) {
     
 
   fileName << ".root";
+  stringstream FullName;
+  FullName<<"~/analysis/run"<<runNum<<"/"<<fileName.str();
   
-  cout<<"Loading file "<<fileName.str()<<"..."<<endl;
+  cout<<"Loading file "<<FullName.str()<<"..."<<endl;
   
-  
-  return fileName.str();
+  frunNum=runNum;
+  return FullName.str();
 
 
 }
@@ -81,6 +83,8 @@ TFile * FileManager::getOutputFile(Double_t FL, Double_t FG, Double_t d, Double_
   !*/
   
   std::stringstream st;
+
+  st<<"~/analysis/run"<<frunNum<<"/";
 
   st<<"FL"<<FL<<"FG"<<FG<<"d"<<d<<"w"<<w;
 

@@ -21,7 +21,8 @@ public:
   //File name streams
   std::stringstream fileName;
   std::stringstream outputFileName;
-
+  
+  Int_t frunNum;
 
   string fileNotes;
   string timingMode;
