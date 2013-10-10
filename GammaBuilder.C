@@ -141,8 +141,8 @@ int main(int argc, char **argv){
   //  outT->BranchRef();
 
   ////////////////////////////////////////////////////////////////////////////////////
-
-
+  if (theInputManager.timeWindowShift !=0)
+    Event->SetGammaPeakTime(theInputManager.timeWindowShift+0.334448);
  
   ////////////////////////////////////////////////////////////////////////////////////
   
@@ -256,8 +256,11 @@ int main(int argc, char **argv){
 
     }
     //Periodic printing
-    if (jentry % 10000 ==0 )
-      cout<<right<<"On event "<<setw(9)<<jentry<<" "<<setprecision(2)<<setw(3)<<((double)jentry)/maxentry*100.0<<"% seconds remaining "<<setprecision(4)<<setw(6)<<timeRate*(maxentry-jentry)<<flush<<"\r";
+    if (jentry % 10000 ==0 ){
+      cout<<flush<<"\r"<<"                                                                                          "<<"\r";
+      cout<<"On Event "<<jentry<<" "<<((double)jentry)/(maxentry)*100<<"% minutes remaining "<<(1.0/60)*timeRate*(maxentry-jentry)<<" hours remaining "<<(1.0/3600)*timeRate*(maxentry-jentry);
+    }
+    //cout<<right<<"On event "<<setw(9)<<jentry<<" "<<setprecision(2)<<setw(3)<<((double)jentry)/maxentry*100.0<<"% seconds remaining "<<setprecision(4)<<setw(6)<<timeRate*(maxentry-jentry)<<flush<<"\r";
 
     
   }//End main analysis loop

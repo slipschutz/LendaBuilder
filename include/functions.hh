@@ -102,17 +102,25 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
       events2[inEvents[i].dchan2.chanid]=&inEvents[i];
     else {
       events2.insert(events2.begin()+inEvents[i].dchan2.chanid,&inEvents[i]);
-      cout<<"CRAP"<<endl;
+      // cout<<"CRAP"<<endl;
+      // test=true;
     }
   }
+  
   for (int i=0;i<(int)events2.size();i++){
     if (events2[i] !=NULL )
       events.push_back(events2[i]);
   }
   if (test){
     cout<<"\n\n\n";
+    cout<<"inEvents "<<endl;
+    for (int i=0;i<inEvents.size();i++){
+      cout<<inEvents[i].dchan2.chanid<<endl;
+    }
+    cout<<"events: "<<endl;
     for (int i=0;i<events.size();i++)
       cout<<events[i]->dchan2.chanid<<endl;
+    int t ;cin>>t;
   }
 
 
