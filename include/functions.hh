@@ -166,6 +166,7 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
     Event->pushTime(events[i]->dchan2.time);
     Event->pushSoftTime(events[i]->dchan2.timelow +events[i]->dchan2.timehigh*4294967296.0+softwareCFD);
     Event->pushSoftwareCFD(softwareCFD);
+    Event->pushCubicCFD(cubicCFD);
     Event->pushCubicTime(events[i]->dchan2.timelow +events[i]->dchan2.timehigh*4294967296.0+cubicCFD);
     Event->pushInternalCFD((events[i]->dchan2.timecfd)/65536.0);
     Event->pushEntryNum(events[i]->jentry);
