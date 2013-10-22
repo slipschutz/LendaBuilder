@@ -166,20 +166,18 @@ Double_t Filter::GetZeroCrossing(std::vector <Double_t> & CFD){
 
   for (int j=0;j< (int) CFD.size()-1;j++) { 
     if (CFD[j] >= 0 && CFD[j+1] < 0 && 
-	TMath::Abs(CFD[j] - CFD[j+1]) > 20 && j>20)
+	TMath::Abs(CFD[j] - CFD[j+1]) > 10 && j>(CFD.size()/2.0)-10)
       {//zero crossing point
-	
 	softwareCFD =j + CFD[j] / ( CFD[j] + TMath::Abs(CFD[j+1]) );
 	thisEventsZeroCrossings.push_back(softwareCFD);
-	
       }
   }
 
-  if (thisEventsZeroCrossings.size() == 0)
+  if (thisEventsZeroCrossings.size() == 0) // no Zero Crossing found
     thisEventsZeroCrossings.push_back(BAD_NUM);
 
   if (thisEventsZeroCrossings.size() != 1 )
-    return -1;
+    return -2*BAD_NUM;
 
   return thisEventsZeroCrossings[0]; // take the first one
 }
