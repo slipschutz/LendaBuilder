@@ -107,9 +107,13 @@ int main(int argc, char **argv){
   cout <<"The number of entires is : "<< nentry << endl ;
   
   // Openning output Tree and output file
-    
+
+
   //Note FileManager expects fileMan->loadFile before getting outputfile
-  if (extFlag == false && ext_sigma_flag==false) //if there are no flags
+  if (theInputManager.reMakePulseShape){
+    outFile= fileMan->getOutputFile(theInputManager.long_gate,theInputManager.short_gate);
+   
+  }else if (extFlag == false && ext_sigma_flag==false) //if there are no flags
     outFile = fileMan->getOutputFile();
   else if (extFlag == true && ext_sigma_flag==false){
     outFile = fileMan->getOutputFile(FL,FG,CFD_delay,CFD_scale_factor*10);
@@ -117,6 +121,7 @@ int main(int argc, char **argv){
     sigma=sigma/10;
     outFile= fileMan->getOutputFile(sigma*10);
   }
+
 
   outT = new TTree("flt","Filtered Data Tree --- Comment Description");
   cout << "Creating filtered Tree"<<endl;
@@ -237,7 +242,7 @@ int main(int argc, char **argv){
       }
       
     }//end while
-    if (EventsInWindow.size()>=2){
+    if (EventsInWindow.size()==1){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       outT->Fill();

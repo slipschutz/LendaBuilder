@@ -15,7 +15,7 @@ public:
   TFile * getOutputFile();
   TFile * getOutputFile(Double_t FL, Double_t FG, Double_t d, Double_t w);
   TFile * getOutputFile(Double_t sigma);
-
+  TFile * getOutputFile(Int_t LG, Int_t SG); 
   TFile *getOutputFile(string );
 
   //File name streams

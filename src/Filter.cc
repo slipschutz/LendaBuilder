@@ -217,6 +217,10 @@ Double_t Filter::GetZeroCubic(std::vector <Double_t> & CFD){
     Y[i][0]=CFD[ theSpotAbove -1+i];
   }
 
+  //check to see if the series of points makes sense
+  if (!(x[0] > 0 && x[1]>0&&x[2]<0&&x[3]<0)){
+    return 2*BAD_NUM;
+  }
 
   TMatrixD A(4,4);//declare 4 by 4 matrix
 

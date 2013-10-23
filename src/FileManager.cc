@@ -140,3 +140,18 @@ TFile *FileManager::getOutputFile(string s){
   return temp;
 
 }
+
+TFile * FileManager::getOutputFile(Int_t LG,Int_t SG){
+
+ 
+
+
+  outputFileName.str("");
+  outputFileName<<"~/analysis/run"<<frunNum<<"/";
+  outputFileName<<fileName.str()<<"-LG"<<LG<<"-SG"<<SG<<".root";
+
+  TFile *temp =new TFile(outputFileName.str().c_str(),"recreate");
+  cout<<"THE OUT PUT FILE IS "<<outputFileName.str()<<endl;
+  return temp;
+
+}
