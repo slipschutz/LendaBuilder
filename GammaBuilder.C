@@ -21,6 +21,7 @@
 //Local Headers
 #include "LendaEvent.hh"
 #include "ddaschannel.h"
+#include "DDASEvent.h"
 #include "Filter.hh"
 #include "FileManager.h"
 #include "InputManager.hh"
@@ -52,7 +53,7 @@ int main(int argc, char **argv){
   }
 
 
-
+  Bool_t isOldFormat=false;
   
   ////////////////////////////////////////////////////////////////////////////////////
 
@@ -136,9 +137,15 @@ int main(int argc, char **argv){
   
   // set input tree branvh variables and addresses
   ////////////////////////////////////////////////////////////////////////////////////
-  ddaschannel * inChannel = new ddaschannel();
-  inT->SetBranchAddress("dchan",&inChannel);
-
+  ddaschannel * inChannel;
+  DDASEvent * inEvent;
+  if (isOldFormat){
+    inChannel = new ddaschannel();
+    inT->SetBranchAddress("dchan",&inChannel);
+  } else {
+    inEvent= new DDASEvent();
+    inT->SetBranchAddress("ddasevent",&inEvent);
+  }
   
   //Specify the output branch
   LendaEvent* Event = new LendaEvent();
@@ -177,72 +184,86 @@ int main(int argc, char **argv){
   startTime = clock();
   for (Long64_t jentry=theInputManager.startEntry; jentry<maxentry;jentry++) { // Main analysis loop
 
-    inT->GetEntry(jentry); // Get the event from the input tree 
-    jentryEvent.jentry=jentry;
-    jentryEvent.dchan2 = ddaschannel(*inChannel);//make new one so it doesn't
-    bool searching;                              //get overwritten by inT->GetEntry
-    if (jentry < maxentry-1)
-      searching =true;
-    else
-      searching=false;
-    int countForward=1;//start at the next one
-    int countForwardNoDelay=1;//count until end of window ignorin timewindow shift
+    if (isOldFormat){
+      inT->GetEntry(jentry); // Get the event from the input tree 
+      jentryEvent.jentry=jentry;
+      jentryEvent.dchan2 = ddaschannel(*inChannel);//make new one so it doesn't
+      bool searching;                              //get overwritten by inT->GetEntry
+      if (jentry < maxentry-1)
+	searching =true;
+      else
+	searching=false;
+      int countForward=1;//start at the next one
+      int countForwardNoDelay=1;//count until end of window ignorin timewindow shift
 
 
-    //put the jentryEvent in the window of events
-    EventsInWindow.push_back(jentryEvent);
-    while (searching){
-      inT->GetEntry(jentry+countForward);//read event into inChannel
-      Double_t TimeDiff =TMath::Abs(jentryEvent.dchan2.time - inChannel->time); // Time between current event and first in window
+      //put the jentryEvent in the window of events
+      EventsInWindow.push_back(jentryEvent);
+      while (searching){
+	inT->GetEntry(jentry+countForward);//read event into inChannel
+	Double_t TimeDiff =TMath::Abs(jentryEvent.dchan2.time - inChannel->time); // Time between current event and first in window
       
-      if ( theInputManager.timeWindowShift == 0 ){ // no shift
-	if (TimeDiff < theInputManager.timeWindow){
-	  //if still in the window do add to list of events in window 
-	  Sl_Event temp;
-	  temp.jentry = jentry +countForward;
-	  temp.dchan2= ddaschannel(*inChannel);
+	if ( theInputManager.timeWindowShift == 0 ){ // no shift
+	  if (TimeDiff < theInputManager.timeWindow){
+	    //if still in the window do add to list of events in window 
+	    Sl_Event temp;
+	    temp.jentry = jentry +countForward;
+	    temp.dchan2= ddaschannel(*inChannel);
 
-	  EventsInWindow.push_back(temp);
-	  countForward++;
-	}else{
-	  searching =false;
-	  jentry = jentry+countForward-1;
-	}
-      } else {  // when there is a time window input
-	if ( TimeDiff < theInputManager.timeWindow){
-	  countForwardNoDelay++;
-	}
+	    EventsInWindow.push_back(temp);
+	    countForward++;
+	  }else{
+	    searching =false;
+	    jentry = jentry+countForward-1;
+	  }
+	} else {  // when there is a time window input
+	  if ( TimeDiff < theInputManager.timeWindow){
+	    countForwardNoDelay++;
+	  }
 
-	if (TimeDiff < theInputManager.timeWindowShift){
-	  //while it is less than the shift count 
-	  countForward++;
-	} else if ( TimeDiff > theInputManager.timeWindowShift && 
-		    TimeDiff < theInputManager.timeWindowShift + theInputManager.timeWindow){
-	  //push events in the delayed time window
-	  Sl_Event temp;
-	  temp.jentry = jentry +countForward;
-	  temp.dchan2= ddaschannel(*inChannel);
+	  if (TimeDiff < theInputManager.timeWindowShift){
+	    //while it is less than the shift count 
+	    countForward++;
+	  } else if ( TimeDiff > theInputManager.timeWindowShift && 
+		      TimeDiff < theInputManager.timeWindowShift + theInputManager.timeWindow){
+	    //push events in the delayed time window
+	    Sl_Event temp;
+	    temp.jentry = jentry +countForward;
+	    temp.dchan2= ddaschannel(*inChannel);
 	  
-	  EventsInWindow.push_back(temp);
-	  countForward++;
-	} else{ 
-	  searching =false;
-	  jentry = jentry+countForwardNoDelay-1;
+	    EventsInWindow.push_back(temp);
+	    countForward++;
+	  } else{ 
+	    searching =false;
+	    jentry = jentry+countForwardNoDelay-1;
+	  }
 	}
       }
-
-
+    
       if (countForward >20){
- 	cout<<"***Warning run away loop***"<<endl;
+	cout<<"***Warning run away loop***"<<endl;
 	cout<<"***Loop started at "<<jentry<<"***"<<endl;
 	cout<<"***Kill loop. Restarting at "<<jentry+1<<"***"<<endl;
 	jentry=1+jentry;
 	EventsInWindow.clear();
 	searching = false;
+      
+      
+      }//end while
+    } else { // end is old format
+
+      inT->GetEntry(jentry);
+      vector <ddaschannel*> v=inEvent->GetData();
+
+      for (int i=0;i<v.size();i++){
+	jentryEvent.dchan2 = ddaschannel((*v[i]));
+	jentryEvent.jentry = jentry+i;
+	EventsInWindow.push_back(jentryEvent);
       }
       
-    }//end while
-    if (EventsInWindow.size()==1){
+    }
+    
+    if (EventsInWindow.size()>=1){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       outT->Fill();
@@ -252,13 +273,10 @@ int main(int argc, char **argv){
  
     //Periodic printing
     if (jentry % 10000 <10 && jentry >=20000 && timeFlag){
-
       timeFlag=false;
       otherTime=clock();
       timeRate = TMath::Abs( double((startTime-otherTime))/double(CLOCKS_PER_SEC));
-      
       timeRate = timeRate/jentry;
-
     }
     //Periodic printing
     if (jentry % 10000 ==0 ){

@@ -24,8 +24,8 @@ ROOTCINT=rootcint
 EVENTLIBPATH=/user/lipschut/Introspective
 LIB=LendaEvent
 EVENTLIB=$(addsuffix $(LDFLAGS),$(LIB))
-DDASCHANNELPATH=/mnt/daqtesting/lenda/sam_analysis/ddasChannel/
-CHLIB=ddaschannel
+DDASCHANNELPATH=/user/lipschut/DDASEvent/
+CHLIB=DDASEvent
 CHEVENTLIB=$(addsuffix $(LDFLAGS),$(CHLIB))
 
 .PHONY: clean get put all test sclean

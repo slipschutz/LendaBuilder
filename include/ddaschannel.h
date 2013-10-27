@@ -1,1 +1,1 @@
-../../ddasChannel/ddaschannel.h
+/user/lipschut/DDASEvent/ddaschannel.h

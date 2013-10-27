@@ -20,10 +20,10 @@ InputManager::InputManager()
   specificFileName="";
 
   //defualt Filter settings see pixie manual
-  FL=2;
+  FL=3;
   FG=0;
   d=3; //in clock ticks
-  w =0.25;
+  w =0;
   traceDelay=50;
   ext_flag=false;//defualt to none meta run format
   
@@ -32,8 +32,8 @@ InputManager::InputManager()
 
   fileNotes="";
 
-  long_gate =25;
-  short_gate=14;
+  long_gate =17;
+  short_gate=5;
   reMakePulseShape=false;
   sigma=1.0;
   maxEntry=-1;
