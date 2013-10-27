@@ -53,7 +53,7 @@ int main(int argc, char **argv){
   }
 
 
-  Bool_t isOldFormat=false;
+  Bool_t isOldFormat=true;
   
   ////////////////////////////////////////////////////////////////////////////////////
 
@@ -266,7 +266,8 @@ int main(int argc, char **argv){
     if (EventsInWindow.size()>=1){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
-      outT->Fill();
+      if (!(Event->channels[0]==0 &&Event->channels[1]==1 &&Event->NumOfChannelsInEvent==2))
+	outT->Fill();
       Event->Clear();//always clear the lenda event
     }
     EventsInWindow.clear();
