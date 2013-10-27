@@ -27,7 +27,7 @@ InputManager::InputManager()
   traceDelay=50;
   ext_flag=false;//defualt to none meta run format
   
-  timeWindow=10; //defualt time window to be 100 ns
+  timeWindow=100; //defualt time window to be 100 ns
   timeWindowShift=0;//shift time window defaulted to 0
 
   fileNotes="";

@@ -263,7 +263,7 @@ int main(int argc, char **argv){
       
     }
     
-    if (EventsInWindow.size()>=1){
+    if (EventsInWindow.size()>1){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       if (!(Event->channels[0]==0 &&Event->channels[1]==1 &&Event->NumOfChannelsInEvent==2))
