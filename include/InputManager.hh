@@ -25,6 +25,8 @@ public:
   Bool_t makeTraces,ext_flag;
   Bool_t correction;
   
+  Bool_t isOldFormat;
+  
   string fileNotes;
   string timingMode;
   Double_t FL,FG,d,w;
@@ -38,6 +40,8 @@ public:
   Double_t long_gate,short_gate;
   
   string specificFileName;
+
+  Double_t minMultiplicity;
 
   Bool_t lean;
   Bool_t fast;

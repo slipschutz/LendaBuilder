@@ -53,7 +53,7 @@ int main(int argc, char **argv){
   }
 
 
-  Bool_t isOldFormat=true;
+  Bool_t isOldFormat=theInputManager.isOldFormat;
   
   ////////////////////////////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@ int main(int argc, char **argv){
 
 
   //  vector <Sl_Event*> CorrelatedEvents(4,NULL);
-  map <Long64_t,bool> mapOfUsedEntries;//Used to prevent double counting
+  //  map <Long64_t,bool> mapOfUsedEntries;//Used to prevent double counting
   Sl_Event jentryEvent;
   vector <Sl_Event> EventsInWindow;
   
@@ -263,7 +263,7 @@ int main(int argc, char **argv){
       
     }
     
-    if (EventsInWindow.size()>1){
+    if (EventsInWindow.size()>=theInputManager.minMultiplicity){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
       if (!(Event->channels[0]==0 &&Event->channels[1]==1 &&Event->NumOfChannelsInEvent==2))

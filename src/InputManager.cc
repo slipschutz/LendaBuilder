@@ -32,6 +32,8 @@ InputManager::InputManager()
 
   fileNotes="";
 
+  isOldFormat=false;
+
   long_gate =17;
   short_gate=5;
   reMakePulseShape=false;
@@ -41,6 +43,8 @@ InputManager::InputManager()
 
   fast=false;
   lean=false;
+
+  minMultiplicity=2;
 
   startEntry=0;
 
@@ -70,11 +74,14 @@ void InputManager::BuildInputMap(){
   ValidNumericalInputs["timewindowshift"]=&timeWindowShift;
   ValidNumericalInputs["twshift"]=&timeWindowShift;
   ValidNumericalInputs["startentry"]=&startEntry;
-
+  ValidNumericalInputs["minmultiplicity"]=&minMultiplicity;
+  ValidNumericalInputs["minn"]=&minMultiplicity;
+  
   // ValidBoolInputs["remake"]=&reMakePulseShape;
 
   ValidBoolInputs["lean"]=&lean;
   ValidBoolInputs["fast"]=&fast;
+  ValidBoolInputs["isoldformat"]=&isOldFormat;
 
   ValidStringInputs["timingmode"]=&timingMode;
   ValidStringInputs["inputfile"]=&specificFileName;
