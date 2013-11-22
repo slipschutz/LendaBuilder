@@ -23,65 +23,103 @@ struct Sl_Event {
 
 
 
-Bool_t checkChannels(vector <Sl_Event>&EventsInWindow,
-		     map <Long64_t,bool>&mapOfUsedEntries){
+// Bool_t checkChannels(vector <Sl_Event>&EventsInWindow,
+// 		     map <Long64_t,bool>&mapOfUsedEntries){
 
-  cout <<"num events "<<EventsInWindow.size()<<endl;
-  vector < vector <bool> > ch;
-  for (int i=0;i<16;i++){
-    vector <bool> temp;
-    ch.push_back(temp);
-  }
+//   cout <<"num events "<<EventsInWindow.size()<<endl;
+//   vector < vector <bool> > ch;
+//   for (int i=0;i<16;i++){
+//     vector <bool> temp;
+//     ch.push_back(temp);
+//   }
 
 
   
-  map <int,Long64_t> entries;
+//   map <int,Long64_t> entries;
   
-  bool duplicateChannelsInWindow=false;
-  for (int i=0;i<(int)EventsInWindow.size();i++){
-    ch[EventsInWindow[i].dchan2.chanid].push_back(true);
-    entries[i]=EventsInWindow[i].jentry;
+//   bool duplicateChannelsInWindow=false;
+//   for (int i=0;i<(int)EventsInWindow.size();i++){
+//     ch[EventsInWindow[i].dchan2.chanid].push_back(true);
+//     entries[i]=EventsInWindow[i].jentry;
     
-    if (ch[EventsInWindow[i].dchan2.chanid].size() >1)
-      duplicateChannelsInWindow=true;
-  }
+//     if (ch[EventsInWindow[i].dchan2.chanid].size() >1)
+//       duplicateChannelsInWindow=true;
+//   }
 
-  for (int i=0;i<16;i++)
-    cout<<"i is "<<i<<" "<<ch[i].size()<<endl;
+//   for (int i=0;i<16;i++)
+//     cout<<"i is "<<i<<" "<<ch[i].size()<<endl;
 
-  if (duplicateChannelsInWindow)
-    return false;
+//   if (duplicateChannelsInWindow)
+//     return false;
 
-  cout<<"the conditions "<<endl;
-  cout<<(ch[0].size()==1 && ch[1].size()==1)<<endl;
-  cout<<(ch[2].size()==1 && ch[3].size()==1)<<endl;
+//   cout<<"the conditions "<<endl;
+//   cout<<(ch[0].size()==1 && ch[1].size()==1)<<endl;
+//   cout<<(ch[2].size()==1 && ch[3].size()==1)<<endl;
   
-  cout<<"The entries "<<endl;
-  for (int i=0;i<(int)entries.size();i++)
-    cout<<"entry i "<<entries[i]<<endl;
+//   cout<<"The entries "<<endl;
+//   for (int i=0;i<(int)entries.size();i++)
+//     cout<<"entry i "<<entries[i]<<endl;
   
 
-  //allowed combinations 
-  if ( (ch[0].size()==1 && ch[1].size()==1)){
-    //currently bar11
+//   //allowed combinations 
+//   if ( (ch[0].size()==1 && ch[1].size()==1)){
+//     //currently bar11
 
-  } else if (ch[2].size()==1 && ch[3].size()==1){
-    //curently bar 23
+//   } else if (ch[2].size()==1 && ch[3].size()==1){
+//     //curently bar 23
     
-  } else {
-    return false;
+//   } else {
+//     return false;
+//   }
+//   return false;
+// }
+
+// void pushRollingWindow(vector <Sl_Event> &previousEvents,ddaschannel *dchan,Long64_t jentry){
+
+// 	Sl_Event e;
+// 	//	e.dchan =dchan;
+// 	e.jentry = jentry;
+// 	previousEvents.push_back(e);
+
+// }
+
+
+void UnPackIt(TTree* inT){
+  TFile * fout = new TFile("upPack.root","recreate");
+
+  DDASEvent *inEvent = new DDASEvent();
+  ddaschannel * Event= new ddaschannel();
+
+  inT->SetBranchAddress("ddasevent",&inEvent);
+
+  TTree * outT = new TTree("dchan","time ordered ddas channels");
+
+  outT->Branch("dchan",&Event);
+  
+
+  Long64_t maxEntry = (Long64_t)inT->GetEntries();
+  cout<<"Num entries is "<<maxEntry<<endl;
+
+
+  for (Long64_t jentry=0;jentry<maxEntry;jentry++){
+    inT->GetEntry(jentry);///Get the DDASEvent
+    int size = inEvent->GetData().size();
+    for ( int i=0;i<size;i++){
+      
+      Event= (inEvent->GetData()[i]);
+      outT->Fill();
+    }
+    
+    if (jentry %1000==0 ){
+      cout<<"On "<<jentry<<endl;
+    }
+
   }
-  return false;
+  outT->Write();
+  fout->Close();
+  
 }
 
-void pushRollingWindow(vector <Sl_Event> &previousEvents,ddaschannel *dchan,Long64_t jentry){
-
-	Sl_Event e;
-	//	e.dchan =dchan;
-	e.jentry = jentry;
-	previousEvents.push_back(e);
-
-}
 
 void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
 	       Filter theFilter,InputManager& inMan){
@@ -176,53 +214,6 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
  
  
 }
-/*
-
-
-
-
-
-
-
-
-
-
-
-	  //for cable arrangement independance
-	  //sort the last size of rolling window evens by channel
-
-	  Double_t start;
-	  Double_t timeDiff;
-	  
-	  for (int i=0;i<previousEvents.size();++i){
-	    events_extra[previousEvents[i].channel]=&(previousEvents[i]);
-	  }
-	  for (int i=0;i<events_extra.size();++i){
-	    if (events_extra[i] != 0 ){
-	      events.push_back(events_extra[i]);
-	    }
-	  }
-
-	  
-	  //timeDiff = 0.5*(events[0]->time + events[1]->time - events[2]->time-events[3]->time);
-	  timeDiff = (events[1]->time -events[0]->time);	  
-	  //timeDiff = 0.5*(events[0]->time + events[1]->time) - events[2]->time;
-	  if (TMath::Abs(timeDiff) <10){
-	    ///This is now a Good event
-	    //Run filters and such on these events 
-	    vector <Double_t> thisEventsFF;
-	    vector <Double_t> thisEventsCFD;
-	    
-
-
-	  }//end timeDiff if
-
-
-
-
-*/
-
-
 
 
 

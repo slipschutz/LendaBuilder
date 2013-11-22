@@ -28,6 +28,8 @@
 #include "CorrectionManager.hh"
 #include <ctime>
 #include <iomanip>
+#include "Settings.hh"
+
 
 #include "functions.hh"
 #define BAD_NUM -10008
@@ -51,7 +53,9 @@ int main(int argc, char **argv){
   if ( !  theInputManager.loadInputs2(inputs) ){//load options and check everything
     return 0;
   }
-
+  
+  Settings *theSettings=new Settings();
+  theInputManager.WriteSettings(theSettings);
 
   Bool_t isOldFormat=theInputManager.isOldFormat;
   
@@ -101,7 +105,12 @@ int main(int argc, char **argv){
 	inT->Add(s);
     }
   }
-  
+
+  bool upPack=false;
+  if (upPack){
+    UnPackIt(inT);
+    return 0;
+  }
   
   
   Long64_t nentry=(Long64_t) (inT->GetEntries());
@@ -238,17 +247,17 @@ int main(int argc, char **argv){
 	    jentry = jentry+countForwardNoDelay-1;
 	  }
 	}
-      }
+      
     
-      if (countForward >20){
-	cout<<"***Warning run away loop***"<<endl;
-	cout<<"***Loop started at "<<jentry<<"***"<<endl;
-	cout<<"***Kill loop. Restarting at "<<jentry+1<<"***"<<endl;
-	jentry=1+jentry;
-	EventsInWindow.clear();
-	searching = false;
-      
-      
+	if (countForward >20){
+	  cout<<"***Warning run away loop***"<<endl;
+	  cout<<"***Loop started at "<<jentry<<"***"<<endl;
+	  cout<<"***Kill loop. Restarting at "<<jentry+1<<"***"<<endl;
+	  jentry=1+jentry;
+	  EventsInWindow.clear();
+	  searching = false;
+	
+	}
       }//end while
     } else { // end is old format
 
@@ -261,13 +270,13 @@ int main(int argc, char **argv){
 	EventsInWindow.push_back(jentryEvent);
       }
       
-    }
     
-    if (EventsInWindow.size()>=theInputManager.minMultiplicity){
+    }
+      if (EventsInWindow.size()>=theInputManager.minMultiplicity){
       packEvent(Event,EventsInWindow,theFilter,theInputManager);
       Event->Finalize();
-      if (!(Event->channels[0]==0 &&Event->channels[1]==1 &&Event->NumOfChannelsInEvent==2))
-	outT->Fill();
+      // if (!(Event->channels[0]==0 &&Event->channels[1]==1 &&Event->NumOfChannelsInEvent==2))
+      outT->Fill();
       Event->Clear();//always clear the lenda event
     }
     EventsInWindow.clear();
@@ -292,6 +301,7 @@ int main(int argc, char **argv){
 
   //Write the tree to file 
   outT->Write();
+  theSettings->Write();
   //Close the file
   outFile->Close();
   

@@ -360,3 +360,35 @@ void InputManager::DumpAllOpitions(){
 
   cout<<"\n#############################################\n"<<endl;
 }
+
+void InputManager::WriteSettings(Settings* theSettings){
+
+  int width =15;
+  stringstream ss;
+
+  theSettings->PushLine("\nFlags that take numerical inputs are: \n");
+  for (map<string,Double_t *>::iterator ii=ValidNumericalInputs.begin();
+       ii!=ValidNumericalInputs.end();ii++){
+    ss<<"Flag "<<setw(width)<<ii->first<<" Value "<<setw(width)<<*ii->second<<endl;
+    theSettings->PushLine(ss.str());
+    ss.str("");
+  }
+
+  theSettings->PushLine("\nFlags that take bool inputs are: \n");
+  for (map<string,Bool_t *>::iterator ii=ValidBoolInputs.begin();
+       ii!=ValidBoolInputs.end();ii++){
+    ss<<"Flag "<<setw(width)<<ii->first<<" Value "<<setw(width)<<*ii->second<<endl;
+    theSettings->PushLine(ss.str());
+    ss.str("");
+  }
+
+  theSettings->PushLine("\nFlags that take string inputs are: \n");
+  for (map<string,string *>::iterator ii=ValidStringInputs.begin();
+       ii!=ValidStringInputs.end();ii++){
+    ss<<"Flag "<<setw(width)<<ii->first<<"ma Value "<<setw(width)<<*ii->second<<endl;
+    theSettings->PushLine(ss.str());
+    ss.str("");
+  }
+
+  theSettings->PushLine("\n#############################################\n");
+}

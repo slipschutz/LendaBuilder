@@ -8,6 +8,7 @@
 #include <string>
 #include "TTree.h"
 #include <map>
+#include "Settings.hh"
 using namespace std;
 
 class InputManager {
@@ -19,6 +20,8 @@ public:
   
   Bool_t loadInputs(vector <string> &);
   Bool_t loadInputs2(vector <string> &);
+  
+  void WriteSettings(Settings*);
 
   Double_t numFiles,runNum;
 
