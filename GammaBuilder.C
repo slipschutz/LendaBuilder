@@ -29,7 +29,7 @@
 #include <ctime>
 #include <iomanip>
 #include "Settings.hh"
-
+#include "LendaPacker.hh"
 
 #include "functions.hh"
 #define BAD_NUM -10008
@@ -39,6 +39,7 @@ using namespace std;
 
 
 int main(int argc, char **argv){
+  
 
   vector <string> inputs;
   for (int i=1;i<argc;++i){
