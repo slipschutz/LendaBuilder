@@ -123,13 +123,6 @@ void UnPackIt(TTree* inT){
 
 void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
 	       Filter theFilter,InputManager& inMan){
-  Double_t FL =inMan.FL;
-  Double_t FG=inMan.FG;
-  int CFD_delay=inMan.d;
-  Double_t CFD_scale_factor=inMan.w;
-  Double_t traceDelay=inMan.traceDelay;
-
-  bool lean =inMan.lean;
   //sort the events by channel
   
   vector <Sl_Event*> events2(16,NULL);
@@ -161,6 +154,26 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
     int t ;cin>>t;
   }
 
+
+  LendaPacker thePacker;
+  thePacker.SetFilter(inMan.FL,inMan.FG,inMan.d,inMan.w);
+  thePacker.SetGates(inMan.long_gate,inMan.short_gate,inMan.long_gate2,inMan.short_gate2);
+  thePacker.lean=inMan.lean;
+  thePacker.SetTraceDelay(inMan.traceDelay);
+  
+  for (int i=0;i<(int)events.size();++i){
+    thePacker.SetDDASChannel(&events[i]->dchan2);
+    thePacker.CalcAll();
+    thePacker.PackEvent(Event);
+  }
+
+
+
+
+
+
+
+  /*
 
   vector <Double_t> thisEventsFF;
   vector <Double_t> thisEventsCFD;
@@ -226,5 +239,5 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
 
   //  Event->Finalize(); //Finalize Calculates various parameters and applies corrections
 
-
+*/
 }
