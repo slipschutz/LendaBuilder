@@ -35,7 +35,12 @@ InputManager::InputManager()
   isOldFormat=false;
 
   long_gate =17;
-  short_gate=5;
+  short_gate=7;
+
+  long_gate2 =17;
+  short_gate2=5;
+
+
   reMakePulseShape=false;
   sigma=1.0;
   maxEntry=-1;
@@ -67,6 +72,9 @@ void InputManager::BuildInputMap(){
   ValidNumericalInputs["d"]=&d;
   ValidNumericalInputs["lg"]=&long_gate;
   ValidNumericalInputs["sg"]=&short_gate;
+  ValidNumericalInputs["lg2"]=&long_gate2;
+  ValidNumericalInputs["sg2"]=&short_gate2;
+
   ValidNumericalInputs["maxentry"]=&maxEntry;
   ValidNumericalInputs["timewindow"]=&timeWindow;
   ValidNumericalInputs["tracedelay"]=&traceDelay;

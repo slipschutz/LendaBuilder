@@ -41,6 +41,7 @@ public:
   Bool_t reMakePulseShape;
 
   Double_t long_gate,short_gate;
+  Double_t long_gate2,short_gate2;
   
   string specificFileName;
 

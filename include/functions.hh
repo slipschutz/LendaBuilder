@@ -203,17 +203,28 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
     Event->pushInternEnergy(events[i]->dchan2.energy);//push internal energy
     Event->pushTime(events[i]->dchan2.time);
     Event->pushSoftTime(events[i]->dchan2.timelow +events[i]->dchan2.timehigh*4294967296.0+softwareCFD);
+    if (lean == false){
+      Event->pushTrace(events[i]->dchan2.trace);//save the trace for later if its there
+      //it is 0 if it isn't
+      Event->pushFilter(thisEventsFF); //save filter if it is there
+      Event->pushCFD(thisEventsCFD); //save CFD if it is there
+    }
+    //Push other thing into the event
+    Event->pushLongGate(longGate); //longer integration window
+    Event->pushShortGate(shortGate);//shorter integration window
+    Event->pushChannel(events[i]->dchan2.chanid);//the channel for this pulse
+    Event->pushEnergy(thisEventsIntegral);;//push trace energy if there
+    Event->pushInternEnergy(events[i]->dchan2.energy);//push internal energy
+    Event->pushTime(events[i]->dchan2.time);
+    Event->pushSoftTime(events[i]->dchan2.timelow +events[i]->dchan2.timehigh*4294967296.0+softwareCFD);
     Event->pushSoftwareCFD(softwareCFD);
     Event->pushCubicCFD(cubicCFD);
     Event->pushCubicTime(events[i]->dchan2.timelow +events[i]->dchan2.timehigh*4294967296.0+cubicCFD);
     Event->pushInternalCFD((events[i]->dchan2.timecfd)/65536.0);
     Event->pushEntryNum(events[i]->jentry);
   }
-   
+
   //  Event->Finalize(); //Finalize Calculates various parameters and applies corrections
- 
- 
+
+
 }
-
-
-
