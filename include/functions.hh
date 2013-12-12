@@ -192,6 +192,8 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
     if (lean == false){
       Event->pushTrace(events[i]->dchan2.trace);//save the trace for later if its there
       //it is 0 if it isn't
+
+
       Event->pushFilter(thisEventsFF); //save filter if it is there
       Event->pushCFD(thisEventsCFD); //save CFD if it is there
     }
