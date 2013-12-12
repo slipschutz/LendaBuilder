@@ -58,47 +58,40 @@ int main(int argc, char **argv){
   Settings *theSettings=new Settings();
   theInputManager.WriteSettings(theSettings);
 
-  Bool_t isOldFormat=theInputManager.isOldFormat;
+
   
   ////////////////////////////////////////////////////////////////////////////////////
-
   //load settings
-  
-  Double_t sigma=theInputManager.sigma; // the sigma used in the fitting option
-
+  //Put some settings into local variables.  Most for control options
   Int_t runNum=theInputManager.runNum;
   Int_t numFiles=theInputManager.numFiles;
-
   Long64_t maxentry=theInputManager.maxEntry;
-
-  
-
   Bool_t extFlag=theInputManager.ext_flag;
   Bool_t ext_sigma_flag=theInputManager.ext_sigma_flag;
-
-  //defualt Filter settings see pixie manual
-  Double_t FL=theInputManager.FL;
-  Double_t FG=theInputManager.FG;
-  int CFD_delay=theInputManager.d; //in clock ticks
-  Double_t CFD_scale_factor =theInputManager.w;
-
-
+  Bool_t isOldFormat=theInputManager.isOldFormat;
+  
+  //Put Gate and timing variables into the Packer ojbect
+  LendaPacker *thePacker = new LendaPacker();
+  thePacker->SetFilter(theInputManager.FL,theInputManager.FG,theInputManager.d,theInputManager.w);
+  thePacker->SetGates(theInputManager.long_gate,theInputManager.short_gate,
+		      theInputManager.long_gate2,theInputManager.short_gate2);
+  thePacker->lean=theInputManager.lean;
+  thePacker->SetTraceDelay(theInputManager.traceDelay);
 
   
 
   //prepare files and output tree
   ////////////////////////////////////////////////////////////////////////////////////
-  TFile *outFile=0;
-  TTree  *outT;
-  FileManager * fileMan = new FileManager();
+  FileManager * fileMan = new FileManager(); //Make New File Manager
   fileMan->fileNotes = theInputManager.fileNotes;
   fileMan->timingMode =theInputManager.timingMode;
+
   //The input trees are put into a TChain
-  TChain * inT;
-  
+  //Expects there to be many files containing trees named dchan
+  TChain * inT;  
   inT= new TChain("dchan");//dchan is name of tree in ddas rootfiles
   if (numFiles == -1 ){
-    TString s = fileMan->loadFile(runNum,0);
+    TString s = fileMan->loadFile(runNum,0); //look for files of format run-####-##.root
     inT->Add(s);
   } else {
     for (Int_t i=0;i<numFiles;i++) {
@@ -117,8 +110,12 @@ int main(int argc, char **argv){
   Long64_t nentry=(Long64_t) (inT->GetEntries());
   cout <<"The number of entires is : "<< nentry << endl ;
   
-  // Openning output Tree and output file
 
+  // Openning output Tree and output file
+  ////////////////////////////////////////////////////////////////////////////////////
+  TFile *outFile=0;
+  TTree  *outT;
+  
 
   //Note FileManager expects fileMan->loadFile before getting outputfile
   if (theInputManager.reMakePulseShape){
@@ -127,10 +124,13 @@ int main(int argc, char **argv){
   }else if (extFlag == false && ext_sigma_flag==false) //if there are no flags
     outFile = fileMan->getOutputFile();
   else if (extFlag == true && ext_sigma_flag==false){
-    outFile = fileMan->getOutputFile(FL,FG,CFD_delay,CFD_scale_factor*10);
+    outFile = fileMan->getOutputFile(theInputManager.FL,theInputManager.FG,
+				     theInputManager.d,theInputManager.w*10);
   } else if (extFlag==false && ext_sigma_flag==true){
-    sigma=sigma/10;
-    outFile= fileMan->getOutputFile(sigma*10);
+    //    sigma=sigma/10;
+    //    outFile= fileMan->getOutputFile(sigma*10);
+    cout<<"NO SIGMA SUTFF "<<endl;
+    return -123;
   }
 
 
@@ -177,7 +177,7 @@ int main(int argc, char **argv){
      ////////////////////////////////////////////////////////////////////////////////////
 
 
-  Filter theFilter; // Filter object
+  //  Filter theFilter; // Filter object
   ////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -261,24 +261,22 @@ int main(int argc, char **argv){
 	}
       }//end while
     } else { // end is old format
-
+      //Building with Pre-Time Correlated DDASEvents
       inT->GetEntry(jentry);
       vector <ddaschannel*> v=inEvent->GetData();
 
       for (int i=0;i<v.size();i++){
-	jentryEvent.dchan2 = ddaschannel((*v[i]));
+	jentryEvent.dchan2 = ddaschannel((*v[i]));//Copy over the channels
 	jentryEvent.jentry = jentry+i;
 	EventsInWindow.push_back(jentryEvent);
       }
-      
-    
+          
     }
       if (EventsInWindow.size()>=theInputManager.minMultiplicity){
-      packEvent(Event,EventsInWindow,theFilter,theInputManager);
-      Event->Finalize();
-      // if (!(Event->channels[0]==0 &&Event->channels[1]==1 &&Event->NumOfChannelsInEvent==2))
-      outT->Fill();
-      Event->Clear();//always clear the lenda event
+	packEvent(Event,EventsInWindow,thePacker);
+	Event->Finalize();
+	outT->Fill();
+	Event->Clear();//always clear the lenda event.  Or Else...
     }
     EventsInWindow.clear();
  
@@ -306,7 +304,7 @@ int main(int argc, char **argv){
   //Close the file
   outFile->Close();
   
-  cout<<"Number of bad fits "<<theFilter.numOfBadFits<<endl;
+
   
   cout<<"\n\n**Finished**\n\n";
   

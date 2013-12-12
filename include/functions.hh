@@ -122,7 +122,7 @@ void UnPackIt(TTree* inT){
 
 
 void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
-	       Filter theFilter,InputManager& inMan){
+	       LendaPacker * thePacker){
   //sort the events by channel
   
   vector <Sl_Event*> events2(16,NULL);
@@ -155,16 +155,18 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
   }
 
 
-  LendaPacker thePacker;
-  thePacker.SetFilter(inMan.FL,inMan.FG,inMan.d,inMan.w);
-  thePacker.SetGates(inMan.long_gate,inMan.short_gate,inMan.long_gate2,inMan.short_gate2);
-  thePacker.lean=inMan.lean;
-  thePacker.SetTraceDelay(inMan.traceDelay);
+  // LendaPacker thePacker;
+  // thePacker.SetFilter(inMan.FL,inMan.FG,inMan.d,inMan.w);
+  // thePacker.SetGates(inMan.long_gate,inMan.short_gate,inMan.long_gate2,inMan.short_gate2);
+  // thePacker.lean=inMan.lean;
+  // thePacker.SetTraceDelay(inMan.traceDelay);
   
   for (int i=0;i<(int)events.size();++i){
-    thePacker.SetDDASChannel(&events[i]->dchan2);
-    thePacker.CalcAll();
-    thePacker.PackEvent(Event);
+    thePacker->SetDDASChannel(&events[i]->dchan2);
+    thePacker->CalcAll();
+    thePacker->SetJEntry(events[i]->jentry);
+    thePacker->PackEvent(Event);
+    
   }
 
 
