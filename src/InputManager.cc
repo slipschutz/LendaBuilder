@@ -17,6 +17,10 @@ InputManager::InputManager()
   numFiles=1;//assume 1 file
   timingMode="softwareCFD";
 
+  GammaPeakTime=-1;
+  GammaPeakTimeLiqLiq=-1;
+
+
   specificFileName="";
 
   //defualt Filter settings see pixie manual
@@ -84,6 +88,12 @@ void InputManager::BuildInputMap(){
   ValidNumericalInputs["startentry"]=&startEntry;
   ValidNumericalInputs["minmultiplicity"]=&minMultiplicity;
   ValidNumericalInputs["minn"]=&minMultiplicity;
+
+  ValidNumericalInputs["gammapeaktime"]=&GammaPeakTime;
+  ValidNumericalInputs["gammapeaktimeliqliq"]=&GammaPeakTimeLiqLiq;
+
+
+  
   
   // ValidBoolInputs["remake"]=&reMakePulseShape;
 

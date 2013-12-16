@@ -41,7 +41,7 @@ $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 
 .cc.o:
 	@echo "Compiling" $< "..."
-	$(CXX) $(CFLAGS) $< -o $@ 
+	@$(CXX) $(CFLAGS) $< -o $@ 
 
 $(MAINO): $(MAIN) $(HEADERS)
 	@echo "Compiling" $< "..."
