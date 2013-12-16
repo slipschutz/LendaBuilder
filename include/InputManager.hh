@@ -55,6 +55,9 @@ public:
 
   Double_t sigma;
 
+  Double_t GammaPeakTime;
+  Double_t GammaPeakTimeLiqLiq;
+
   Bool_t ext_sigma_flag;
 private:
   vector <string> split (const string &s, char delim, vector<string> &elems);

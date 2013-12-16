@@ -163,9 +163,24 @@ int main(int argc, char **argv){
   //  outT->BranchRef();
 
   ////////////////////////////////////////////////////////////////////////////////////
-  if (theInputManager.timeWindowShift !=0)
+  //If not set by InputManager then let the Event chose its defualt 
+  if ( theInputManager.GammaPeakTime != -1 ){
+    Event->SetGammaPeakTime(theInputManager.GammaPeakTime);
+  }
+  if (theInputManager.GammaPeakTimeLiqLiq != -1){
+    Event->SetGammaPeakTimeLiqLiq(theInputManager.GammaPeakTimeLiqLiq);
+  }
+  //if there is a shift given then the peak time should be the shift
+  ///Add 0.334448 becuase the Event will take the peakSpot and subtract
+  //0.33448 to get the shift.  Shift =GPT-0.333488.  Making the time spectrum
+  //after the shift for the random runs uniform starting from 0 and going to
+  //the timewidnow width
+  if (theInputManager.timeWindowShift !=0){
     Event->SetGammaPeakTime(theInputManager.timeWindowShift+0.334448);
+    Event->SetGammaPeakTimeLiqLiq(theInputManager.timeWindowShift+0.334448);
+  }
  
+
   ////////////////////////////////////////////////////////////////////////////////////
   
   if(maxentry == -1)
