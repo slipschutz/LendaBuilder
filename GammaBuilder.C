@@ -75,7 +75,7 @@ int main(int argc, char **argv){
   thePacker->SetFilter(theInputManager.FL,theInputManager.FG,theInputManager.d,theInputManager.w);
   thePacker->SetGates(theInputManager.long_gate,theInputManager.short_gate,
 		      theInputManager.long_gate2,theInputManager.short_gate2);
-  thePacker->lean=theInputManager.lean;
+
   thePacker->SetTraceDelay(theInputManager.traceDelay);
 
   
@@ -179,7 +179,7 @@ int main(int argc, char **argv){
     Event->SetGammaPeakTime(theInputManager.timeWindowShift+0.334448);
     Event->SetGammaPeakTimeLiqLiq(theInputManager.timeWindowShift+0.334448);
   }
- 
+  Event->SetLean(theInputManager.lean);// Set lean inside the lendaEvent
 
   ////////////////////////////////////////////////////////////////////////////////////
   

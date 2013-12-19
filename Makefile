@@ -23,10 +23,10 @@ ROOTCINT=rootcint
 #EVENTLIBPATH=/mnt/daqtesting/lenda/sam_analysis/LendaEvent/
 EVENTLIBPATH=/user/lipschut/Introspective
 LIB=LendaEvent
-EVENTLIB=$(addsuffix $(LDFLAGS),$(LIB))
+EVENTLIB=$(LIB)
 DDASCHANNELPATH=/user/lipschut/DDASEvent/
 CHLIB=DDASEvent
-CHEVENTLIB=$(addsuffix $(LDFLAGS),$(CHLIB))
+CHEVENTLIB=$(CHLIB)
 
 .PHONY: clean get put all test sclean
 
@@ -34,7 +34,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE) : $(OBJECTS) $(MAINO)
 	@echo "Building target" $@ "..." 
-	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH) -l$(EVENTLIB) -L$(DDASCHANNELPATH) -l$(CHEVENTLIB) -L/user/lipschut/Settings -lSettings -L/user/lipschut/Filter -lFilter -L/user/lipschut/LendaPacker/ -lLendaPacker
+	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS) $(MAINO) $(LDLIBS) -L$(EVENTLIBPATH) -l$(EVENTLIB) -L$(DDASCHANNELPATH) -l$(CHEVENTLIB) -L/user/lipschut/Settings -lSettings -L/user/lipschut/Filter -lFilter -L/user/lipschut/LendaPacker/ -lLendaPacker -Wl,-rpath,$(LENDAHEAD)/LendaCommonLib 
 	@echo
 	@echo "Build succeed"
 
