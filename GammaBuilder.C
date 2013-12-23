@@ -180,6 +180,8 @@ int main(int argc, char **argv){
     Event->SetGammaPeakTimeLiqLiq(theInputManager.timeWindowShift+0.334448);
   }
   Event->SetLean(theInputManager.lean);// Set lean inside the lendaEvent
+  Event->setGainCorrections(0.369254,12.1052,0);//Set channels 0 gain cor
+  Event->setGainCorrections(0.246648,14.6706,1);//Set channels 1 gain cor
 
   ////////////////////////////////////////////////////////////////////////////////////
   
