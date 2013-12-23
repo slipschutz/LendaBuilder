@@ -53,7 +53,7 @@ InputManager::InputManager()
   fast=false;
   lean=false;
 
-  minMultiplicity=2;
+  minMultiplicity=1;
 
   startEntry=0;
 
