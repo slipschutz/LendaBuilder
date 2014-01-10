@@ -289,11 +289,11 @@ int main(int argc, char **argv){
       }
           
     }
-      if (EventsInWindow.size()>=theInputManager.minMultiplicity){
-	packEvent(Event,EventsInWindow,thePacker);
-	Event->Finalize();
-	outT->Fill();
-	Event->Clear();//always clear the lenda event.  Or Else...
+    if (EventsInWindow.size()>=theInputManager.minMultiplicity){
+      packEvent(Event,EventsInWindow,thePacker);
+      Event->Finalize();
+      outT->Fill();
+      Event->Clear();//always clear the lenda event.  Or Else...
     }
     EventsInWindow.clear();
  

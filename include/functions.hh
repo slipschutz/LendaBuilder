@@ -163,8 +163,8 @@ void packEvent(LendaEvent *Event,vector <Sl_Event> inEvents,
   
   for (int i=0;i<(int)events.size();++i){
     thePacker->SetDDASChannel(&events[i]->dchan2);
+    thePacker->SetJEntry(events[i]->jentry);   
     thePacker->CalcAll();
-    thePacker->SetJEntry(events[i]->jentry);
     thePacker->PackEvent(Event);
     
   }
