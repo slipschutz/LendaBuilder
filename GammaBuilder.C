@@ -100,7 +100,7 @@ int main(int argc, char **argv){
     }
   }
 
-  bool upPack=false;
+  bool upPack=false;;
   if (upPack){
     UnPackIt(inT);
     return 0;
@@ -284,7 +284,7 @@ int main(int argc, char **argv){
 
       for (int i=0;i<v.size();i++){
 	jentryEvent.dchan2 = ddaschannel((*v[i]));//Copy over the channels
-	jentryEvent.jentry = jentry+i;
+	jentryEvent.jentry = jentry;
 	EventsInWindow.push_back(jentryEvent);
       }
           
