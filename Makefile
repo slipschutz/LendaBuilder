@@ -9,7 +9,7 @@ TEMP2=$(shell ls ./include/*.hh~)
 OBJECTS=$(SOURCES:.cc=.o) 
 HEADERS=$(shell ls ./include/*h*)
 
-EXE= GammaBuilder
+EXE= LendaBuilder
 EXECUTABLE= $(EXE)
 MAIN=$(addsuffix .C,$(EXE))
 MAINO=./src/$(addsuffix .o,$(EXE))
