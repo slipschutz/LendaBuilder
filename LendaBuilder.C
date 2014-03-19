@@ -46,7 +46,7 @@ int main(int argc, char **argv){
     inputs.push_back(string(argv[i]));
   }
   if (inputs.size() == 0 ){ // no argumnets display helpful message
-    cout<<"Usage: ./GammaBuilder runNumber [options:value]"<<endl;
+    cout<<"Usage: ./LendaBuilder runNumber [options:value]"<<endl;
     return 0;
   }  
   
